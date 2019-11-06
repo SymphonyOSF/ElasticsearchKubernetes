@@ -10,3 +10,4 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+

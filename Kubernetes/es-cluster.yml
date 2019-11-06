@@ -7,25 +7,38 @@ spec:
 #  Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
   image: luisplazas/elastic:7.4.2
   nodeSets:
-#    Dedicated master node(s)
-    - name: master
+    - name: masters
       count: 1
       config:
         node.master: true
         node.data: false
         node.ingest: false
         node.ml: false
-        cluster.remote.connect: false
-#      podTemplate:
-#        spec:
-#          nodeSelector:
-#            beta.kubernetes.io/instance-type: m4.large
+      podTemplate:
+        spec:
+          initContainers:
+            - name: sysctl
+              securityContext:
+                privileged: true
+              command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+          nodeSelector:
+            beta.kubernetes.io/instance-type: c5.4xlarge
+          containers:
+            - name: elastic
+              # specify resource limits and requests
+              resources:
+                requests:
+                  memory: 32Gi
+                  cpu: 16
+                limits:
+                  memory: 32Gi
+                  cpu: 16
     - name: default
       count: 2
       config:
         node.master: false
         node.data: true
-        node.ingest: flase
+        node.ingest: false
         node.ml: false
       podTemplate:
         metadata:
@@ -33,21 +46,23 @@ spec:
             # additional labels for pods
             foo: bar
         spec:
+          nodeSelector:
+            beta.kubernetes.io/instance-type: c5.9xlarge
           initContainers:
           - name: sysctl
             securityContext:
               privileged: true
             command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           containers:
-            - name: elasticsearch
+            - name: elastic
               # specify resource limits and requests
               resources:
                 requests:
-                  memory: 28Gi
-                  cpu: 6
+                  memory: 72Gi
+                  cpu: 36
                 limits:
-                  memory: 32Gi
-                  cpu: 8
+                  memory: 72Gi
+                  cpu: 36
 
       # request 10Gi of persistent data storage for pods in this topology element
       volumeClaimTemplates:
@@ -75,6 +90,12 @@ spec:
        loadBalancerSourceRanges:
          - 208.184.224.194/32
          - 64.79.115.2/32
+         - 35.239.150.121/32
+         - 35.188.142.59/32
+         - 35.225.119.41/32
+         - 35.227.18.124/32
+         - 35.227.87.44/32
+         - 35.237.136.190/32
      tls:
        selfSignedCertificate:
          disabled: true

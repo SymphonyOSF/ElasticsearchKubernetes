@@ -1,52 +1,29 @@
-variable "worker-asg-name" {
-  default = ""
-}
+variable "worker-asg-name" {}
 
-variable "master-eks-node-version" {
-  default = ""
-}
+variable "master-eks-node-version" {}
 
-variable "sym-search-subnet-ids" {
-  default = []
-}
+variable "sym-search-subnet-ids" {}
 
-variable "cluster-name" {
-  default = ""
-}
+variable "cluster-name" {}
 
-variable "master-eks-node-endpoint" {
-  default = ""
-}
+variable "master-eks-node-endpoint" {}
 
-variable "master-eks-node-certificate-authority-data" {
-  default = ""
-}
+variable "master-eks-node-certificate-authority-data" {}
 
-variable "sym-search-vpc-id" {
-  default = ""
-}
+variable "sym-search-vpc-id" {}
 
-variable "aws-security-group-master-sg-id" {
-  default = ""
-}
+variable "aws-security-group-master-sg-id" {}
 
-variable "desired_capacity" {
-  default = 1
-}
+variable "desired_capacity" {}
 
-variable "instance_type" {
-  default = "m4.2xlarge"
-}
+variable "instance_type" {}
 
-variable "max_size" {
-  default = 1
-}
+variable "max_size" {}
 
-variable "min_size" {
-  default = 1
-}
+variable "min_size" {}
 
 variable "ssh_keyname" {}
-//variable "other_group_sg_id" {}
+
+variable "other_group_sg_id" {}
 
 variable "aws_iam_instance_profile_name" {}

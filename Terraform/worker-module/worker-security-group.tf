@@ -27,18 +27,18 @@ resource "aws_security_group_rule" "worker-sg-ingress-self" {
   type                     = "ingress"
 }
 
-//resource "aws_security_group_rule" "other-sg-ingress-self" {
-//  description              = "Allow node to communicate with each other"
-//  from_port                = 0
-//  protocol                 = "-1"
-//  security_group_id        = aws_security_group.worker-sg.id
-//  source_security_group_id = var.other_group_sg_id
-//  to_port                  = 65535
-//  type                     = "ingress"
-//}
+resource "aws_security_group_rule" "other-sg-ingress-self" {
+  description              = "Allow node to communicate with each other"
+  from_port                = 0
+  protocol                 = "-1"
+  security_group_id        = aws_security_group.worker-sg.id
+  source_security_group_id = var.other_group_sg_id
+  to_port                  = 65535
+  type                     = "ingress"
+}
 
-resource "aws_security_group" "allow_ssh" {
-  name            = "allow-ssh-sg"
+resource "aws_security_group" "allow_ssh_worker" {
+  name        = "${var.worker-asg-name}-ssh-sg"
   description     = "Allow SSH traffic for worker instances"
   vpc_id          = var.sym-search-vpc-id
 
