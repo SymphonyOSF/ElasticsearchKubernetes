@@ -24,14 +24,14 @@ spec:
           nodeSelector:
             beta.kubernetes.io/instance-type: c5.4xlarge
           containers:
-            - name: elastic
+            - name: elasticsearch
               # specify resource limits and requests
               resources:
                 requests:
-                  memory: 32Gi
-                  cpu: 16
+                  memory: 28G
+                  cpu: 14
                 limits:
-                  memory: 32Gi
+                  memory: 32G
                   cpu: 16
     - name: default
       count: 2
@@ -54,14 +54,14 @@ spec:
               privileged: true
             command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           containers:
-            - name: elastic
+            - name: elasticsearch
               # specify resource limits and requests
               resources:
                 requests:
-                  memory: 72Gi
-                  cpu: 36
+                  memory: 71G
+                  cpu: 35
                 limits:
-                  memory: 72Gi
+                  memory: 72G
                   cpu: 36
 
       # request 10Gi of persistent data storage for pods in this topology element

@@ -3018,6 +3018,8 @@ spec:
         control-plane: elastic-operator
     spec:
       serviceAccountName: elastic-operator
+      nodeSelector:
+        beta.kubernetes.io/instance-type: c5.4xlarge
       containers:
         - image: docker.elastic.co/eck/eck-operator:1.0.0-beta1
           name: manager
