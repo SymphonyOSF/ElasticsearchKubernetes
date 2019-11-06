@@ -43,8 +43,8 @@ spec:
       podTemplate:
         metadata:
           labels:
-            # additional labels for pods
-            foo: bar
+            datanode: true
+            es-node-type: data
         spec:
           nodeSelector:
             beta.kubernetes.io/instance-type: c5.9xlarge
@@ -87,6 +87,9 @@ spec:
    service:
      spec:
        type: LoadBalancer
+       selector:
+         datanode: true
+         elasticsearch.k8s.elastic.co/node-data: true
        loadBalancerSourceRanges:
          - 208.184.224.194/32
          - 64.79.115.2/32
