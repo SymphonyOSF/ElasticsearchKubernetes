@@ -17,7 +17,7 @@ module "data-node-workers" {
   master-eks-node-certificate-authority-data  = aws_eks_cluster.master-eks-node.certificate_authority.0.data
   sym-search-vpc-id                           = aws_vpc.sym-search-vpc.id
   aws-security-group-master-sg-id             = aws_security_group.master-sg.id
-  desired_capacity                            = 7
+  desired_capacity                            = 2
   instance_type                               = "c5.9xlarge"
   min_size                                    = 2
   max_size                                    = 10

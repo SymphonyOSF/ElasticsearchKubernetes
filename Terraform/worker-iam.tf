@@ -17,6 +17,35 @@ resource "aws_iam_role" "worker-iam" {
 POLICY
 }
 
+resource "aws_iam_policy" "worker_auto_scale_policy" {
+  name        = "worker_auto_scale_policy"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DescribeTags",
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:TerminateInstanceInAutoScalingGroup",
+                "ec2:DescribeLaunchTemplateVersions"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerAutoScalePolicy" {
+  policy_arn = aws_iam_policy.worker_auto_scale_policy.arn
+  role       = aws_iam_role.worker-iam.name
+}
+
 resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.worker-iam.name

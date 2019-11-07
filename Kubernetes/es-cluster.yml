@@ -34,7 +34,7 @@ spec:
                   memory: 32G
                   cpu: 16
     - name: default
-      count: 7
+      count: 2
       volumeClaimTemplates:
         - metadata:
             #            Name must always be elasticsearch-data
