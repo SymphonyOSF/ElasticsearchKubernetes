@@ -11,13 +11,13 @@ module "data-node-workers" {
   source                                      = "./worker-module"
   worker-asg-name                             = "data-node-workers"
   master-eks-node-version                     = aws_eks_cluster.master-eks-node.version
-  sym-search-subnet-ids                       = aws_subnet.sym-search-subnet.*.id
+  sym-search-subnet-ids                       = [aws_subnet.sym-search-subnet.0.id]
   cluster-name                                = var.cluster-name
   master-eks-node-endpoint                    = aws_eks_cluster.master-eks-node.endpoint
   master-eks-node-certificate-authority-data  = aws_eks_cluster.master-eks-node.certificate_authority.0.data
   sym-search-vpc-id                           = aws_vpc.sym-search-vpc.id
   aws-security-group-master-sg-id             = aws_security_group.master-sg.id
-  desired_capacity                            = 2
+  desired_capacity                            = 7
   instance_type                               = "c5.9xlarge"
   min_size                                    = 2
   max_size                                    = 10

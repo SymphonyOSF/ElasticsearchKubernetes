@@ -86,6 +86,15 @@ resource "aws_security_group_rule" "cluster-ingress-node-https" {
   to_port                  = 443
   type                     = "ingress"
 }
+resource "aws_security_group_rule" "cluster-ingress-node-https-2" {
+  description              = "Allow pods to communicate with the cluster API Server"
+  from_port                = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.worker-sg.id
+  source_security_group_id = var.aws-security-group-master-sg-id
+  to_port                  = 443
+  type                     = "ingress"
+}
 
 output "security_group_id" {
   value = aws_security_group.worker-sg.id
