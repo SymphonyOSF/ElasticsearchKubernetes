@@ -19,5 +19,7 @@ kubectl -n kube-system annotate deployment.apps/cluster-autoscaler cluster-autos
 #Set the image to the current K8S version
 kubectl -n kube-system set image deployment.apps/cluster-autoscaler cluster-autoscaler=k8s.gcr.io/cluster-autoscaler:v1.14.6
 
+#Configure elastic operator
 kubectl apply -f ./all-in-one.yaml
+#Configure elasticsearcg cluster
 kubectl apply -f ./es-cluster.yml
