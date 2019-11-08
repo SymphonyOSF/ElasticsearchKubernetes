@@ -93,7 +93,7 @@ function delete_index() {
 
 function register_s3_repo(){
     echo "Registering S3 repository..."
-    curl -u "elastic:$PASSWORD" -k --retry 10 --retry-connrefused -X PUT "${ELB_URL}/_snapshot/s3_repository" -H 'Content-Type: application/json' -d '
+    curl -u "elastic:$PASSWORD" -k --retry-connrefused -X PUT "${ELB_URL}/_snapshot/s3_repository" -H 'Content-Type: application/json' -d '
     {
       "type": "s3",
       "settings": {
