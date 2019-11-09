@@ -41,6 +41,29 @@ resource "aws_iam_policy" "worker_auto_scale_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "s3_policy" {
+  name = "s3_policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerS3Policy" {
+  policy_arn = aws_iam_policy.s3_policy.arn
+  role       = aws_iam_role.worker-iam.name
+}
+
 resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerAutoScalePolicy" {
   policy_arn = aws_iam_policy.worker_auto_scale_policy.arn
   role       = aws_iam_role.worker-iam.name

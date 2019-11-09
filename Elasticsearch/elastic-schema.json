@@ -1,0 +1,129 @@
+{
+  "mappings": {
+    "_source": {
+      "excludes": ["tokenIds"]
+    },
+    "properties": {
+      "chatType": {
+        "index": true,
+        "type": "keyword"
+      },
+      "compositeDocId": {
+        "index": true,
+        "type": "keyword"
+      },
+      "externalOrigination": {
+        "index": true,
+        "type": "boolean"
+      },
+      "fromId": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "fromPrettyName": {
+        "analyzer": "standard",
+        "index": true,
+        "type": "text"
+      },
+      "fromScreenName": {
+        "analyzer": "standard",
+        "index": true,
+        "type": "text"
+      },
+      "fromType": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "hashtag": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "ingestionDate": {
+        "index": true,
+        "type": "date",
+        "doc_values": true
+      },
+      "isPrivate": {
+        "index": true,
+        "type": "boolean"
+      },
+      "isPublicRoom": {
+        "index": true,
+        "type": "boolean"
+      },
+      "messageId": {
+        "index": true,
+        "type": "keyword"
+      },
+      "msgIdxFromChattype": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "msgIdxHashtag": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "msgIdxUsermention": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "roomType": {
+        "index": true,
+        "type": "keyword"
+      },
+      "sendingApp": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "threadId": {
+        "index": true,
+        "type": "keyword"
+      },
+      "toId": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "tokenIds": {
+        "index": true,
+        "store": false,
+        "type": "keyword"
+      },
+      "usermentionId": {
+        "index": true,
+        "normalizer": "keyword_case_insensitive",
+        "type": "keyword"
+      },
+      "usermentionText": {
+        "analyzer": "standard",
+        "index": true,
+        "type": "text"
+      }
+    }
+  },
+  "settings": {
+    "analysis": {
+      "normalizer": {
+        "keyword_case_insensitive": {
+          "filter": [
+            "lowercase"
+          ],
+          "type": "custom"
+        }
+      }
+    },
+    "index": {
+      "translog.durability": "async",
+      "number_of_shards": 4,
+      "number_of_replicas" : 1,
+      "refresh_interval": "10s"
+    }
+  }
+}
