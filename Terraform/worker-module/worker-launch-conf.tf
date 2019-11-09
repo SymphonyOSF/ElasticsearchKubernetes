@@ -11,10 +11,8 @@ locals {
   worker-node-userdata = <<USERDATA
 #!/bin/bash
 set -o xtrace
-sudo ulimit -l unlimited
 sudo swapoff -a
 sed -i '/^LimitNOFILE=*/a LimitMEMLOCK=infinity' /usr/lib/systemd/system/docker.service
-
 sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 /etc/eks/bootstrap.sh --apiserver-endpoint '${var.master-eks-node-endpoint}' --b64-cluster-ca '${var.master-eks-node-certificate-authority-data}' '${var.cluster-name}'
