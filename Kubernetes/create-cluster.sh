@@ -23,3 +23,5 @@ kubectl -n kube-system set image deployment.apps/cluster-autoscaler cluster-auto
 kubectl apply -f ./all-in-one.yaml
 #Configure elasticsearcg cluster
 kubectl apply -f ./es-cluster.yml
+
+kubectl apply -f ./kibana.yaml
