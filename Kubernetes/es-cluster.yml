@@ -1,7 +1,7 @@
 apiVersion: elasticsearch.k8s.elastic.co/v1beta1
 kind: Elasticsearch
 metadata:
-  name: symsearch2
+  name: symsearch
 spec:
   version: 7.4.2
 #  Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.

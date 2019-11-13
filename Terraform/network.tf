@@ -10,14 +10,14 @@ resource "aws_vpc" "sym-search-vpc" {
   }
 }
 
-//Creates 2 subnets, used for testing multiple AZs
+//Creates var.num_availability_zones subnets
+//used for spawning the cluster accross multiple AZs
 resource "aws_subnet" "sym-search-subnet" {
-  count = 2
+  count = var.num_availability_zones
 
   availability_zone = data.aws_availability_zones.available.names[count.index]
   cidr_block        = "10.0.${count.index * 16}.0/20"
   vpc_id            = aws_vpc.sym-search-vpc.id
-//  map_public_ip_on_launch = true
 
 tags = {
     "Name"                                      = "sym-eks-node"
@@ -44,7 +44,7 @@ resource "aws_route_table" "sym-search-route-table" {
 }
 
 resource "aws_route_table_association" "sym-search-route-table-asso" {
-  count           = 2
+  count           = var.num_availability_zones
   subnet_id       = aws_subnet.sym-search-subnet.*.id[count.index]
   route_table_id  = aws_route_table.sym-search-route-table.id
 }
