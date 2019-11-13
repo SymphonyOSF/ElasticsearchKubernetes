@@ -1,0 +1,33 @@
+apiVersion: kibana.k8s.elastic.co/v1beta1
+kind: Kibana
+metadata:
+  name: symsearch
+spec:
+  version: 7.4.2
+  count: 1
+  elasticsearchRef:
+    name: symsearch
+  podTemplate:
+    spec:
+      #      The name of the container must always be kibana
+      containers:
+        - name: kibana
+          resources:
+            requests:
+              memory: 0.5G
+              cpu: 1
+            limits:
+              memory: 2G
+              cpu: 2
+      nodeSelector:
+        beta.kubernetes.io/instance-type: c5.xlarge
+      http:
+        service:
+          spec:
+            type: NodePort
+            selector:
+              common.k8s.elastic.co/type: kibana
+            ports:
+              - protocol: TCP
+                port: 5601
+                targetPort: 5601
