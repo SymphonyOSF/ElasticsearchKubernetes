@@ -1,7 +1,7 @@
 apiVersion: elasticsearch.k8s.elastic.co/v1beta1
 kind: Elasticsearch
 metadata:
-  name: symsearch
+  name: symsearch2
 spec:
   version: 7.4.2
 #  Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
@@ -22,17 +22,17 @@ spec:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           nodeSelector:
-            beta.kubernetes.io/instance-type: c5.4xlarge
+            beta.kubernetes.io/instance-type: c5.xlarge
           containers:
             - name: elasticsearch
               # specify resource limits and requests
               resources:
                 requests:
-                  memory: 28G
-                  cpu: 12
+                  memory: 7G
+                  cpu: 3
                 limits:
-                  memory: 32G
-                  cpu: 16
+                  memory: 8G
+                  cpu: 4
     - name: default
       count: 1
       volumeClaimTemplates:
@@ -44,7 +44,7 @@ spec:
               - ReadWriteOnce
             resources:
               requests:
-                storage: 25Gi
+                storage: 75Gi
             storageClassName: gp2
       config:
         node.master: false
@@ -58,7 +58,7 @@ spec:
             sym-node-type: "data"
         spec:
           nodeSelector:
-            beta.kubernetes.io/instance-type: c5.9xlarge
+            beta.kubernetes.io/instance-type: c5.2xlarge
           initContainers:
           - name: memlock-soft
             securityContext:
@@ -77,11 +77,11 @@ spec:
               # specify resource limits and requests
               resources:
                 requests:
-                  memory: 51926912Ki
-                  cpu: 32
+                  memory: 14G
+                  cpu: 6
                 limits:
-                  memory: 71926912Ki
-                  cpu: 36
+                  memory: 16G
+                  cpu: 8
 
 #    secureSettings:
 #    - secretName: ref-to-secret
@@ -92,6 +92,10 @@ spec:
 #       path: newkey # project a key to a specific path (optional)
   http:
    service:
+     metadata:
+       annotations:
+#         Must be a string
+         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
      spec:
        type: LoadBalancer
        selector:

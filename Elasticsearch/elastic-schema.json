@@ -122,8 +122,8 @@
     "index": {
       "translog.durability": "async",
       "number_of_shards": 4,
-      "number_of_replicas" : 1,
-      "refresh_interval": "10s"
+      "number_of_replicas" : 0,
+      "refresh_interval": "-1"
     }
   }
 }
