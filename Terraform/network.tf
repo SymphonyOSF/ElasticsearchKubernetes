@@ -1,11 +1,12 @@
 data "aws_availability_zones" "available" {}
 
 resource "aws_vpc" "sym-search-vpc" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_hostnames = true
+  cidr_block            = "10.0.0.0/16"
+  enable_dns_hostnames  = true
+  enable_dns_support    = true
 
   tags = {
-    "Name" = "sym-eks-node"
+    "Name" = "sym-search-eks-vpc"
     "kubernetes.io/cluster/${var.cluster-name}" = "shared"
   }
 }
@@ -20,7 +21,7 @@ resource "aws_subnet" "sym-search-subnet" {
   vpc_id            = aws_vpc.sym-search-vpc.id
 
 tags = {
-    "Name"                                      = "sym-eks-node"
+    "Name"                                      = "sym-search-eks-subnet"
     "kubernetes.io/role/elb"                    = 1
     "kubernetes.io/cluster/${var.cluster-name}" = "shared"
   }

@@ -41,6 +41,36 @@ resource "aws_iam_policy" "worker_auto_scale_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "worker_dns_change_policy" {
+  name        = "worker_dns_change_policy"
+  policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+       "route53:ChangeResourceRecordSets"
+     ],
+     "Resource": [
+       "arn:aws:route53:::hostedzone/*"
+     ]
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+       "route53:ListHostedZones",
+       "route53:ListResourceRecordSets"
+     ],
+     "Resource": [
+       "*"
+     ]
+   }
+ ]
+}
+EOF
+}
+
 resource "aws_iam_policy" "s3_policy" {
   name = "s3_policy"
   policy = <<EOF
@@ -61,6 +91,11 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerS3Policy" {
   policy_arn = aws_iam_policy.s3_policy.arn
+  role       = aws_iam_role.worker-iam.name
+}
+
+resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerDnsPolicy" {
+  policy_arn = aws_iam_policy.worker_dns_change_policy.arn
   role       = aws_iam_role.worker-iam.name
 }
 

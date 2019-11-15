@@ -46,3 +46,21 @@ variable "desired_num_master_nodes" {
 variable "num_availability_zones" {
   default = 2
 }
+
+//Service node conf
+
+variable "service_node_instante_type" {
+  default = "t3.small"
+}
+
+variable "min_num_service_nodes" {
+  default = 1
+}
+
+variable "max_num_service_nodes" {
+  default = 30
+}
+
+variable "desired_num_service_nodes" {
+  default = 2
+}

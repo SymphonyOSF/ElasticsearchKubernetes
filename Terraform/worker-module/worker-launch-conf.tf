@@ -25,7 +25,7 @@ resource "aws_launch_configuration" "worker-launch-conf" {
   image_id                    = data.aws_ami.eks-worker.id
   instance_type               = var.instance_type
   name_prefix                 = var.worker-asg-name
-  security_groups             = [aws_security_group.worker-sg.id, aws_security_group.allow_ssh_worker.id]
+  security_groups             = [aws_security_group.worker-sg.id, var.central_sg_id]
   user_data_base64            = base64encode(local.worker-node-userdata)
   key_name                    = var.ssh_keyname
 

@@ -24,6 +24,6 @@ variable "min_size" {}
 
 variable "ssh_keyname" {}
 
-variable "other_group_sg_id" {}
+variable "central_sg_id" {}
 
 variable "aws_iam_instance_profile_name" {}
