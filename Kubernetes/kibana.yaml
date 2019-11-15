@@ -5,6 +5,8 @@ metadata:
 spec:
   version: 7.4.2
   count: 1
+  config:
+    elasticsearch.ssl.verificationMode: none
   elasticsearchRef:
     name: symsearch
   podTemplate:
@@ -20,14 +22,27 @@ spec:
               memory: 2G
               cpu: 2
       nodeSelector:
-        beta.kubernetes.io/instance-type: c5.xlarge
-      http:
-        service:
-          spec:
-            type: NodePort
-            selector:
-              common.k8s.elastic.co/type: kibana
-            ports:
-              - protocol: TCP
-                port: 5601
-                targetPort: 5601
+        beta.kubernetes.io/instance-type: t3.small
+  http:
+    service:
+      metadata:
+        annotations:
+          #         Must be a string
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
+          external-dns.alpha.kubernetes.io/hostname: sym-search-dev-kibana.devi.symphony.com
+      spec:
+        type: LoadBalancer
+        selector:
+          common.k8s.elastic.co/type: kibana
+        loadBalancerSourceRanges:
+          - 208.184.224.194/32
+          - 64.79.115.2/32
+          - 35.239.150.121/32
+          - 35.188.142.59/32
+          - 35.225.119.41/32
+          - 35.227.18.124/32
+          - 35.227.87.44/32
+          - 35.237.136.190/32
+    tls:
+      certificate:
+        secretName: my-cert
