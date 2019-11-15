@@ -7,7 +7,7 @@ then
     kubectl -n kube-system logs deployment.apps/cluster-autoscaler -f
 else
     echo "----------------------------------------------"
-    echo "Kubernetes log follower"
+    echo "Kubernetes log live tail"
     echo "----------------------------------------------"
     echo "One argument is necessary"
     echo "logs.sh [argument]"

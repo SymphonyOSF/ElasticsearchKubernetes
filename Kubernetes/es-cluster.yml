@@ -4,7 +4,7 @@ metadata:
   name: symsearch
 spec:
   version: 7.4.2
-#  Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
+  #  Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
   image: luisplazas/elastic:7.4.2
   nodeSets:
     - name: masters
@@ -37,7 +37,7 @@ spec:
       count: 1
       volumeClaimTemplates:
         - metadata:
-#            Name must always be elasticsearch-data
+            #            Name must always be elasticsearch-data
             name: elasticsearch-data
           spec:
             accessModes:
@@ -60,18 +60,18 @@ spec:
           nodeSelector:
             beta.kubernetes.io/instance-type: c5.2xlarge
           initContainers:
-          - name: memlock-soft
-            securityContext:
-              privileged: true
-            command: ['sh', '-c', 'echo "elasticsearch soft memlock unlimited" >> /etc/security/limits.conf']
-          - name: memlock-hard
-            securityContext:
-              privileged: true
-            command: ['sh', '-c', 'echo "elasticsearch hard memlock unlimited" >> /etc/security/limits.conf']
-          - name: sysctl
-            securityContext:
-              privileged: true
-            command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+            - name: memlock-soft
+              securityContext:
+                privileged: true
+              command: ['sh', '-c', 'echo "elasticsearch soft memlock unlimited" >> /etc/security/limits.conf']
+            - name: memlock-hard
+              securityContext:
+                privileged: true
+              command: ['sh', '-c', 'echo "elasticsearch hard memlock unlimited" >> /etc/security/limits.conf']
+            - name: sysctl
+              securityContext:
+                privileged: true
+              command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           containers:
             - name: elasticsearch
               # specify resource limits and requests
@@ -83,39 +83,33 @@ spec:
                   memory: 16G
                   cpu: 8
 
-#    secureSettings:
-#    - secretName: ref-to-secret
-#    - secretName: another-ref-to-secret
-#     # expose only a subset of the secret keys (optional)
-#     entries:
-#     - key: value1
-#       path: newkey # project a key to a specific path (optional)
+  #    secureSettings:
+  #    - secretName: ref-to-secret
+  #    - secretName: another-ref-to-secret
+  #     # expose only a subset of the secret keys (optional)
+  #     entries:
+  #     - key: value1
+  #       path: newkey # project a key to a specific path (optional)
   http:
-   service:
-     metadata:
-       annotations:
-#         Must be a string
-         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
-     spec:
-       type: LoadBalancer
-       selector:
-         sym-node-type: "data"
-       loadBalancerSourceRanges:
-         - 208.184.224.194/32
-         - 64.79.115.2/32
-         - 35.239.150.121/32
-         - 35.188.142.59/32
-         - 35.225.119.41/32
-         - 35.227.18.124/32
-         - 35.227.87.44/32
-         - 35.237.136.190/32
-#     tls:
-#       selfSignedCertificate:
-#         disabled: true
-         # add a list of SANs into the self-signed HTTP certificate
-#         subjectAltNames:
-#         - ip: 192.168.1.2
-#         - dns: "*.amazonaws.com"
-  #     certificate:
-  #       # provide your own certificate
-  #       secretName: my-cert
+    service:
+      metadata:
+        annotations:
+          #         Must be a string
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
+          external-dns.alpha.kubernetes.io/hostname: sym-search-dev-elastic.devi.symphony.com
+      spec:
+        type: LoadBalancer
+        selector:
+          sym-node-type: "data"
+        loadBalancerSourceRanges:
+          - 208.184.224.194/32
+          - 64.79.115.2/32
+          - 35.239.150.121/32
+          - 35.188.142.59/32
+          - 35.225.119.41/32
+          - 35.227.18.124/32
+          - 35.227.87.44/32
+          - 35.237.136.190/32
+    tls:
+      certificate:
+        secretName: my-cert
