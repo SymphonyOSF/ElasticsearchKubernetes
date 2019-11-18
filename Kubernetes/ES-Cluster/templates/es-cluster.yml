@@ -1,20 +1,36 @@
+#@ load("@ytt:data", "data")
+
 apiVersion: elasticsearch.k8s.elastic.co/v1beta1
 kind: Elasticsearch
 metadata:
-  name: symsearch
+  name: #@ data.values.cluster_name
 spec:
   version: 7.4.2
-  #  Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
+  #! Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
+  #! Github link:
   image: luisplazas/elastic:7.4.2
   nodeSets:
-    - name: masters
-      count: 1
+    - name: master
+      count: #@ int(int(data.values.node_configuration.master.count))
+      volumeClaimTemplates:
+        - metadata:
+            name: elasticsearch-data
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 12G
+            storageClassName: gp2
       config:
         node.master: true
         node.data: false
         node.ingest: false
         node.ml: false
       podTemplate:
+        metadata:
+          labels:
+            sym-node-type: #@ str(data.values.cluster_name) +"-master-node"
         spec:
           initContainers:
             - name: sysctl
@@ -25,7 +41,7 @@ spec:
             beta.kubernetes.io/instance-type: c5.xlarge
           containers:
             - name: elasticsearch
-              # specify resource limits and requests
+              imagePullPolicy: Always
               resources:
                 requests:
                   memory: 7G
@@ -33,18 +49,18 @@ spec:
                 limits:
                   memory: 8G
                   cpu: 4
-    - name: default
-      count: 1
+    - name: data
+      count: #@ int(int(data.values.node_configuration.data.count))
       volumeClaimTemplates:
         - metadata:
-            #            Name must always be elasticsearch-data
+            #!           Name must always be elasticsearch-data
             name: elasticsearch-data
           spec:
             accessModes:
               - ReadWriteOnce
             resources:
               requests:
-                storage: 75Gi
+                storage: #@ data.values.node_configuration.data.storage_size
             storageClassName: gp2
       config:
         node.master: false
@@ -55,26 +71,19 @@ spec:
       podTemplate:
         metadata:
           labels:
-            sym-node-type: "data"
+            sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
         spec:
           nodeSelector:
             beta.kubernetes.io/instance-type: c5.2xlarge
           initContainers:
-            - name: memlock-soft
-              securityContext:
-                privileged: true
-              command: ['sh', '-c', 'echo "elasticsearch soft memlock unlimited" >> /etc/security/limits.conf']
-            - name: memlock-hard
-              securityContext:
-                privileged: true
-              command: ['sh', '-c', 'echo "elasticsearch hard memlock unlimited" >> /etc/security/limits.conf']
             - name: sysctl
               securityContext:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           containers:
             - name: elasticsearch
-              # specify resource limits and requests
+              imagePullPolicy: Always
+              #!specify resource limits and requests
               resources:
                 requests:
                   memory: 14G
@@ -82,25 +91,17 @@ spec:
                 limits:
                   memory: 16G
                   cpu: 8
-
-  #    secureSettings:
-  #    - secretName: ref-to-secret
-  #    - secretName: another-ref-to-secret
-  #     # expose only a subset of the secret keys (optional)
-  #     entries:
-  #     - key: value1
-  #       path: newkey # project a key to a specific path (optional)
   http:
     service:
       metadata:
         annotations:
-          #         Must be a string
+          #!Must be a string
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
-          external-dns.alpha.kubernetes.io/hostname: sym-search-dev-elastic.devi.symphony.com
+#!         external-dns.alpha.kubernetes.io/hostname: sym-search-dev-elastic.devi.symphony.com
       spec:
         type: LoadBalancer
         selector:
-          sym-node-type: "data"
+          sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
         loadBalancerSourceRanges:
           - 208.184.224.194/32
           - 64.79.115.2/32
@@ -110,6 +111,9 @@ spec:
           - 35.227.18.124/32
           - 35.227.87.44/32
           - 35.237.136.190/32
-    tls:
-      certificate:
-        secretName: my-cert
+#!   tls:
+#!     selfSignedCertificate:
+#!       disabled: true
+#!   tls:
+#!     certificate:
+#!       secretName: my-cert

@@ -8,7 +8,7 @@ cd ../Terraform/
 terraform output config_map_aws_auth >> ../Kubernetes/config_map_aws_auth.yml
 cd ../Kubernetes
 
-#Apply config_map for K8S to discover worker nodes
+#Apply config_map file to K8S, this will allow the control plane discover worker nodes
 kubectl apply -f ./config_map_aws_auth.yml
 
 #Install AWS auto-scaler
@@ -19,9 +19,18 @@ kubectl -n kube-system annotate deployment.apps/cluster-autoscaler cluster-autos
 #Set the image to the current K8S version
 kubectl -n kube-system set image deployment.apps/cluster-autoscaler cluster-autoscaler=k8s.gcr.io/cluster-autoscaler:v1.14.6
 
-#Configure elastic operator
-kubectl apply -f ./all-in-one.yaml
-#Configure elasticsearcg cluster
-kubectl apply -f ./es-cluster.yml
+#Bring up DNS mapping service
+#kubectl apply -f ./DNS/external_dns.yaml
 
-kubectl apply -f ./kibana.yaml
+#---------- Kubernetes Dashboard ------------
+# Run the Kubernetes Dashboard
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+# Create admin user
+kubectl apply -f ./Dashboard/user.yaml
+# Bind admin user to cluster
+kubectl apply -f ./Dashboard/cluster_binding.yaml
+
+#-------- /End Kubernetes Dashboard ----------
+
+#Configure the elastic operator
+kubectl apply -f ./all-in-one.yaml

@@ -9,4 +9,4 @@ fi
 
 PASSWORD=$(kubectl get secret "$1-es-elastic-user"  -o=jsonpath='{.data.elastic}' | base64 --decode)
 echo "Password is: $PASSWORD"
-kubectl port-forward "service/$1-kb-http" "$2":5601
+kubectl port-forward "service/$1-es-http" "$2"

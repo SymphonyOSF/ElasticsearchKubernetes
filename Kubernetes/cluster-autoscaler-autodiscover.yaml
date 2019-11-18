@@ -131,6 +131,8 @@ spec:
         prometheus.io/port: '8085'
     spec:
       serviceAccountName: cluster-autoscaler
+      nodeSelector:
+        beta.kubernetes.io/instance-type: t3.small
       containers:
         - image: k8s.gcr.io/cluster-autoscaler:v1.12.3
           name: cluster-autoscaler

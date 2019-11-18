@@ -1,17 +1,21 @@
+#@ load("@ytt:data", "data")
 apiVersion: kibana.k8s.elastic.co/v1beta1
 kind: Kibana
 metadata:
-  name: symsearch
+  name: #@ "kibana-" + data.values.cluster_name
 spec:
   version: 7.4.2
   count: 1
   config:
     elasticsearch.ssl.verificationMode: none
   elasticsearchRef:
-    name: symsearch
+    name: #@ data.values.cluster_name
   podTemplate:
+    metadata:
+      labels:
+        sym-node-type: #@ str(data.values.cluster_name) +"-kibana-node"
     spec:
-      #      The name of the container must always be kibana
+      #! The name of the container must always be kibana
       containers:
         - name: kibana
           resources:
@@ -27,13 +31,13 @@ spec:
     service:
       metadata:
         annotations:
-          #         Must be a string
+          #! Must be a string
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
           external-dns.alpha.kubernetes.io/hostname: sym-search-dev-kibana.devi.symphony.com
       spec:
         type: LoadBalancer
         selector:
-          common.k8s.elastic.co/type: kibana
+          sym-node-type: #@ str(data.values.cluster_name) +"-kibana-node"
         loadBalancerSourceRanges:
           - 208.184.224.194/32
           - 64.79.115.2/32
@@ -43,6 +47,6 @@ spec:
           - 35.227.18.124/32
           - 35.227.87.44/32
           - 35.237.136.190/32
-    tls:
-      certificate:
-        secretName: my-cert
+#!    tls:
+#!      certificate:
+#!        secretName: my-cert
