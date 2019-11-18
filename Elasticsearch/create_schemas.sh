@@ -68,7 +68,7 @@ function wait_for_reindex() {
 
 # $1: Number of socialmessage indices to delete
 function delete_indices(){
-#    delete_index "socialmessage"
+    delete_index "socialmessage"
     for ((i=0; i<$1; i++));
     do
        delete_index "socialmessage$i"
