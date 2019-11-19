@@ -25,10 +25,8 @@ kubectl -n kube-system set image deployment.apps/cluster-autoscaler cluster-auto
 #---------- Kubernetes Dashboard ------------
 # Run the Kubernetes Dashboard
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
-# Create admin user
-kubectl apply -f ./Dashboard/user.yaml
-# Bind admin user to cluster
-kubectl apply -f ./Dashboard/cluster_binding.yaml
+# Create dashboard admin user and attach admin role to it
+kubectl apply -f ./Dashboard/dashboard-user.yaml
 
 #-------- /End Kubernetes Dashboard ----------
 
