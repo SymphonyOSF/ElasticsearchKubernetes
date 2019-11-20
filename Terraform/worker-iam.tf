@@ -15,6 +15,15 @@ resource "aws_iam_role" "worker-iam" {
   ]
 }
 POLICY
+
+  tags = {
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
+    Environment                                 = var.environment-tag
+  }
 }
 
 resource "aws_iam_policy" "worker_auto_scale_policy" {

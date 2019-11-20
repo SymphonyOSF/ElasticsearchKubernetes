@@ -17,6 +17,15 @@ resource "aws_iam_role" "sym-search-iam" {
   ]
 }
 EOF
+
+  tags = {
+    Name            = "elasticEksCluster"
+    "Owner:team"    = "search"
+    Org             = "engineering"
+    Customer        = "symphony"
+    CreatedBy       = "terraform"
+    Environment     = var.environment-tag
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "sym-cluster-AmazonEKSClusterPolicy" {

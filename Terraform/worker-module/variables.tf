@@ -27,3 +27,9 @@ variable "ssh_keyname" {}
 variable "central_sg_id" {}
 
 variable "aws_iam_instance_profile_name" {}
+
+variable "environment-tag" {}
+
+//variable "node_role_iam_arn" {}
+//
+//variable "ssh_sg_id" {}

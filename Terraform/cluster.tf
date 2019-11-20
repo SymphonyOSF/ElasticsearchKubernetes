@@ -1,5 +1,13 @@
 terraform {
   required_version = ">= 0.12.0"
+
+  backend "s3" {
+    bucket          = "search-dev-terraform-backend"
+    encrypt         = true
+    key             = "terraform.tfstate"
+    region          = "us-east-1"
+    dynamodb_table  = "sym-search-dev-terraform-lock"
+  }
 }
 
 provider "aws" {
@@ -20,9 +28,13 @@ resource "aws_security_group" "central-node-sg" {
   }
 
   tags = {
-    Name                                        = "terraform-eks-central-sg"
+    Name            = "elasticEksCluster"
+    "Owner:team"    = "search"
+    Org             = "engineering"
+    Customer        = "symphony"
+    CreatedBy       = "terraform"
+    Environment     = var.environment-tag
   }
-
 }
 
 module "data-node-workers" {
@@ -42,6 +54,7 @@ module "data-node-workers" {
   central_sg_id                               = aws_security_group.central-node-sg.id
   aws_iam_instance_profile_name               = aws_iam_instance_profile.worker-instance-profile.name
   ssh_keyname                                 = aws_key_pair.eks-nodes-key.key_name
+  environment-tag                             = var.environment-tag
 }
 
 module "master-node-workers" {
@@ -61,6 +74,7 @@ module "master-node-workers" {
   central_sg_id                               = aws_security_group.central-node-sg.id
   aws_iam_instance_profile_name               = aws_iam_instance_profile.worker-instance-profile.name
   ssh_keyname                                 = aws_key_pair.eks-nodes-key.key_name
+  environment-tag                             = var.environment-tag
 }
 
 # Start service group nodes
@@ -82,4 +96,5 @@ module "service-node-workers" {
   central_sg_id                               = aws_security_group.central-node-sg.id
   aws_iam_instance_profile_name               = aws_iam_instance_profile.worker-instance-profile.name
   ssh_keyname                                 = aws_key_pair.eks-nodes-key.key_name
+  environment-tag                             = var.environment-tag
 }

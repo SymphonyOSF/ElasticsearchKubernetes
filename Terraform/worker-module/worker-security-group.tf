@@ -11,8 +11,13 @@ resource "aws_security_group" "worker-sg" {
   }
 
   tags = {
-    Name                                        = "terraform-eks-worker-sg"
-//    IMPORTANT: There can only be one security group with this tag
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
+    Environment                                 = var.environment-tag
+    //    IMPORTANT: There can only be one security group with this tag
     "kubernetes.io/cluster/${var.cluster-name}" =  "owned"
   }
 

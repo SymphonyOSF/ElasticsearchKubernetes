@@ -32,4 +32,5 @@ resource "aws_launch_configuration" "worker-launch-conf" {
   lifecycle {
     create_before_destroy = true
   }
+
 }

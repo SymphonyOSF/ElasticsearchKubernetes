@@ -6,7 +6,12 @@ resource "aws_vpc" "sym-search-vpc" {
   enable_dns_support    = true
 
   tags = {
-    "Name" = "sym-search-eks-vpc"
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
+    Environment                                 = var.environment-tag
     "kubernetes.io/cluster/${var.cluster-name}" = "shared"
   }
 }
@@ -20,18 +25,28 @@ resource "aws_subnet" "sym-search-subnet" {
   cidr_block        = "10.0.${count.index * 16}.0/20"
   vpc_id            = aws_vpc.sym-search-vpc.id
 
-tags = {
-    "Name"                                      = "sym-search-eks-subnet"
+  tags = {
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
     "kubernetes.io/role/elb"                    = 1
     "kubernetes.io/cluster/${var.cluster-name}" = "shared"
   }
+
 }
 
 resource "aws_internet_gateway" "sym-search-gateway" {
   vpc_id = aws_vpc.sym-search-vpc.id
 
   tags = {
-    Name = "sym-eks"
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
+    Environment                                 = var.environment-tag
   }
 }
 
@@ -41,6 +56,15 @@ resource "aws_route_table" "sym-search-route-table" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.sym-search-gateway.id
+  }
+
+  tags = {
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
+    Environment                                 = var.environment-tag
   }
 }
 
