@@ -29,13 +29,3 @@ resource "aws_security_group_rule" "sym-cluster-ingress-workstation-https" {
   to_port           = 443
   type              = "ingress"
 }
-
-resource "aws_security_group_rule" "control_plane_extra_sg" {
-  description              = "Allow this ASG to communicate with all other ASGs."
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.master-sg.id
-  source_security_group_id = aws_security_group.central-node-sg.id
-  type                     = "ingress"
-}
