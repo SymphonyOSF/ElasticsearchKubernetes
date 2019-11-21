@@ -1,5 +1,9 @@
+variable "environment-tag" {
+  default = "dev"
+}
+
 variable "region" {
-  default = "us-west-2"
+  default = "us-east-1"
 }
 
 variable "cluster-name" {

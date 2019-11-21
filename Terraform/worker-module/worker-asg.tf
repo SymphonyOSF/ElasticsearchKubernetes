@@ -6,33 +6,51 @@ resource "aws_autoscaling_group" "worker-asg" {
   name                 = var.worker-asg-name
   vpc_zone_identifier  = var.sym-search-subnet-ids
 
-  tag {
-    key                 = "Name"
-    value               = var.worker-asg-name
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "kubernetes.io/cluster/${var.cluster-name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "kubernetes.io/cluster/${var.cluster-name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/enabled"
-    value               = true
-    propagate_at_launch = true
-  }
+  tags = [
+    {
+      key                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
+      value               = "owned"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "k8s.io/cluster-autoscaler/enabled"
+      value               = true
+      propagate_at_launch = true
+    },
+    {
+      key                 = "kubernetes.io/cluster/${var.cluster-name}"
+      value               = "owned"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Name"
+      value               = "elasticEksCluster"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Owner:team"
+      value               = "search"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Org"
+      value               = "engineering"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Customer"
+      value               = "symphony"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "CreatedBy"
+      value               = "terraform"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Environment"
+      value               = var.environment-tag
+      propagate_at_launch = true
+    }
+  ]
 }

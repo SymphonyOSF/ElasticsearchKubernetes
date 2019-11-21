@@ -6,4 +6,13 @@ data "aws_ami" "eks-worker" {
 
   most_recent = true
   owners      = ["602401143452"] # Amazon EKS AMI Account ID
+
+  tags = {
+    Name                                        = "elasticEksCluster"
+    "Owner:team"                                = "search"
+    Org                                         = "engineering"
+    Customer                                    = "symphony"
+    CreatedBy                                   = "terraform"
+    Environment                                 = var.environment-tag
+  }
 }
