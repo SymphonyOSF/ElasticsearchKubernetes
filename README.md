@@ -15,11 +15,14 @@ This deployment automates the following capabilities:
 
 # Project structure
 
-### Docker image
-A custom image is built on top of the official elasticsearch image on ./ElasticImage directory
+### ./ESClusterDeployment
+Directory containing all files necessary to deploy a new Elasticsearch cluster. This is automatically added to the docker image that simplified the process.
 
-### Infrastructure code
-All the infrastructure required for deploying the cluster is managed using terraform on the ./Terraform directory.
+### ./ESDataImport
+Directory containing scripts for automatically importing test data into an existing Elastic cluster.
 
-### Kubernetes files
-All the Kubernetes resources are defined on the ./Kubernetes directory.
+### ./Terraform
+Directory containing all the infrastructure code for the EKS cluster.
+
+### ./Kubernetes 
+Directory containing all the Kubernetes resources needed to bootstrap the EKS cluster. 
