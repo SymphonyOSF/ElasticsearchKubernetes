@@ -44,10 +44,10 @@ spec:
               imagePullPolicy: Always
               resources:
                 requests:
-                  memory: 7G
-                  cpu: 3
+                  memory: 6Gi
+                  cpu: 2
                 limits:
-                  memory: 8G
+                  memory: 7.45Gi
                   cpu: 4
     - name: data
       count: #@ int(int(data.values.node_configuration.data.count))
@@ -67,29 +67,29 @@ spec:
         node.data: true
         node.ingest: false
         node.ml: false
-        bootstrap.memory_lock: true
+        bootstrap.memory_lock: false
       podTemplate:
         metadata:
           labels:
             sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
         spec:
-          nodeSelector:
-            beta.kubernetes.io/instance-type: c5.2xlarge
           initContainers:
             - name: sysctl
               securityContext:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+          nodeSelector:
+            beta.kubernetes.io/instance-type: c5.2xlarge
           containers:
             - name: elasticsearch
               imagePullPolicy: Always
               #!specify resource limits and requests
               resources:
                 requests:
-                  memory: 14G
+                  memory: 13Gi
                   cpu: 6
                 limits:
-                  memory: 16G
+                  memory: 15.21Gi
                   cpu: 8
   http:
     service:
