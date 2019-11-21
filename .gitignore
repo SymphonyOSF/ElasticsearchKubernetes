@@ -1,3 +1,6 @@
+#Ignore .DS_Store
+*.DS_Store
+
 # Ignore all certificate files
 *.pem
 *.key
