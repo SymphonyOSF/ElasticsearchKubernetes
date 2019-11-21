@@ -45,6 +45,8 @@ ytt --data-value "cluster_name=$CLUSTER_NAME" \
 kubectl apply -f "$CLUSTER_NAME.yml"
 
 echo "Your new cluster is called: ${CLUSTER_NAME}"
+echo "Retrieving information..."
+sleep 10
 echo "Password for elastic user:"
 kubectl get secret "$CLUSTER_NAME-es-elastic-user" -o=jsonpath='{.data.elastic}' | base64 --decode
 echo ""

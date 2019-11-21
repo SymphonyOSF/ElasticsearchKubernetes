@@ -10,10 +10,10 @@ if [ ! -f "./${CLUSTER_NAME}" ]; then
 fi
 
 # Delete the secret containing the SSL certificate
-kubectl delete secret ${CLUSTER_NAME}
+#kubectl delete secret ${CLUSTER_NAME}
 
 #Remove elasticsearch and kibana deployments/sts based on the name given as parameter.
-kubectl delete -f "./${CLUSTER_NAME}.yml"
+kubectl delete -f "./${CLUSTER_NAME}"
 
 if [[ $0 == 0 ]]; then
     rm -rf "./${CLUSTER_NAME}"
