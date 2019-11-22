@@ -1,5 +1,5 @@
 resource "aws_security_group" "worker_ssg_sg" {
-  name        = "${var.worker-asg-name}_ssh_sg"
+  name        = "${var.worker-asg-name}_ssh_node_group_sg"
   description = "Security group for allowing ssh to worker nodes"
   vpc_id      = var.vpc_id
 

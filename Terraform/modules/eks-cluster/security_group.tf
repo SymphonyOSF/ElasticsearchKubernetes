@@ -1,5 +1,5 @@
 resource "aws_security_group" "master-sg" {
-  name        = "sym-eks-cluster-sg"
+  name        = "${var.cluster_name}_eks_master_sg"
   description = "Cluster communication with worker nodes"
   vpc_id      = var.vpc_id
 

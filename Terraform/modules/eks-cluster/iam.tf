@@ -1,7 +1,7 @@
 //EKS Master role
 resource "aws_iam_role" "sym-search-iam" {
 
-  name = "sym-terraform-eks-cluster"
+  name = "${var.cluster_name}-master-iam"
 
   assume_role_policy = <<EOF
 {
