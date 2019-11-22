@@ -24,7 +24,7 @@ EOF
     Org             = "engineering"
     Customer        = "symphony"
     CreatedBy       = "terraform"
-    Environment     = var.environment-tag
+    Environment     = var.environment_tag
   }
 }
 
