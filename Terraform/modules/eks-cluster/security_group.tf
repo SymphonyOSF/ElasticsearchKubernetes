@@ -1,7 +1,7 @@
 resource "aws_security_group" "master-sg" {
   name        = "sym-eks-cluster-sg"
   description = "Cluster communication with worker nodes"
-  vpc_id      = aws_vpc.sym-search-vpc.id
+  vpc_id      = var.vpc_id
 
   egress {
     from_port   = 0
@@ -16,7 +16,7 @@ resource "aws_security_group" "master-sg" {
     Org             = "engineering"
     Customer        = "symphony"
     CreatedBy       = "terraform"
-    Environment     = var.environment-tag
+    Environment     = var.environment_tag
   }
 }
 

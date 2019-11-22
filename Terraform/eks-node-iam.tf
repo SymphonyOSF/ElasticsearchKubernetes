@@ -1,5 +1,6 @@
+//This file has to exist in the base directory as it has to be the same for all nodes.
 resource "aws_iam_role" "worker-iam" {
-  name = "worker-iam"
+  name = "node_iam"
 
   assume_role_policy = <<POLICY
 {

@@ -16,6 +16,6 @@ variable "ssh_keyname" {}
 
 variable "environment-tag" {}
 
-variable "node_role_iam_arn" {}
+variable "vpc_id" {}
 
-variable "ssh_sg_id" {}
+variable "node_role_iam_arn" {}

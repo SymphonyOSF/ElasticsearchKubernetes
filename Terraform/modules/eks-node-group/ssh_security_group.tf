@@ -1,7 +1,7 @@
 resource "aws_security_group" "worker_ssg_sg" {
-  name        = "worker_ssg_sg"
+  name        = "${var.worker-asg-name}_ssh_sg"
   description = "Security group for allowing ssh to worker nodes"
-  vpc_id      = aws_vpc.sym-search-vpc.id
+  vpc_id      = var.vpc_id
 
   egress {
     from_port   = 0
