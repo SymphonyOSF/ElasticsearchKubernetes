@@ -38,17 +38,17 @@ spec:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           nodeSelector:
-            beta.kubernetes.io/instance-type: c5.xlarge
+            beta.kubernetes.io/instance-type: c5.large
           containers:
             - name: elasticsearch
               imagePullPolicy: Always
               resources:
                 requests:
-                  memory: 6Gi
-                  cpu: 2
+                  memory: 3Gi
+                  cpu: 1
                 limits:
-                  memory: 7.45Gi
-                  cpu: 4
+                  memory: 3.45Gi
+                  cpu: 2
     - name: data
       count: #@ int(int(data.values.node_configuration.data.count))
       volumeClaimTemplates:
@@ -79,18 +79,18 @@ spec:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           nodeSelector:
-            beta.kubernetes.io/instance-type: c5.2xlarge
+            beta.kubernetes.io/instance-type: c5.xlarge
           containers:
             - name: elasticsearch
               imagePullPolicy: Always
               #!specify resource limits and requests
               resources:
                 requests:
-                  memory: 13Gi
-                  cpu: 6
+                  memory: 6Gi
+                  cpu: 3
                 limits:
-                  memory: 15.21Gi
-                  cpu: 8
+                  memory: 7.45Gi
+                  cpu: 4
   http:
     service:
       metadata:
