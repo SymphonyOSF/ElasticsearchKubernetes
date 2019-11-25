@@ -114,6 +114,6 @@ spec:
 #!   tls:
 #!     selfSignedCertificate:
 #!       disabled: true
-#!   tls:
-#!     certificate:
-#!       secretName: my-cert
+    tls:
+     certificate:
+       secretName: my-cert
