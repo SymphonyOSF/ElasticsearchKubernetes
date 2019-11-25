@@ -1,6 +1,6 @@
 //This file has to exist in the base directory as it has to be the same for all nodes.
 resource "aws_iam_role" "worker-iam" {
-  name = "node_iam"
+  name = "${var.cluster-name}_node_iam"
 
   assume_role_policy = <<POLICY
 {
@@ -19,7 +19,7 @@ POLICY
 }
 
 resource "aws_iam_policy" "worker_auto_scale_policy" {
-  name        = "worker_auto_scale_policy"
+  name        = "${var.cluster-name}_worker_auto_scale_policy"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -43,7 +43,7 @@ EOF
 }
 
 resource "aws_iam_policy" "worker_dns_change_policy" {
-  name        = "worker_dns_change_policy"
+  name        = "${var.cluster-name}_worker_dns_change_policy"
   policy = <<EOF
 {
  "Version": "2012-10-17",
@@ -73,7 +73,7 @@ EOF
 }
 
 resource "aws_iam_policy" "s3_policy" {
-  name = "s3_policy"
+  name = "${var.cluster-name}_s3_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
