@@ -12,21 +12,8 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-  mapUsers: |
-    - userarn: arn:aws:iam::189141687483:user/uppinder.chugh@symphony.com
-      username: uppinder.chugh@symphony.com
-      groups:
-        - system:masters
-    - userarn: arn:aws:iam::189141687483:user/arn:aws:iam::189141687483:user/serkan
-      username: serkan
-      groups:
-        - system:masters
-    - userarn: arn:aws:iam::189141687483:user/long.zuo
-      username: long.zuo
-      groups:
-        - system:masters
-    - userarn: arn:aws:iam::189141687483:user/ptzafos
-      username: ptzafos
+    - rolearn: ${aws_iam_role.eks_access_role.arn}
+      username: ${aws_iam_role.eks_access_role.name}
       groups:
         - system:masters
 CONFIGMAPAWSAUTH

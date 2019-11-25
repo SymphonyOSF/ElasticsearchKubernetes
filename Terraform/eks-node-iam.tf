@@ -121,6 +121,6 @@ resource "aws_iam_role_policy_attachment" "worker-node-AmazonEC2ContainerRegistr
 }
 
 resource "aws_iam_instance_profile" "worker-instance-profile" {
-  name = "worker-instance-profile"
+  name = "${var.cluster-name}-worker-instance-profile"
   role = aws_iam_role.worker-iam.name
 }

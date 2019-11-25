@@ -7,8 +7,8 @@ variable "region" {
 }
 
 variable "cluster-name" {
-  default = "sym-search-dev-eks"
-  type    = "string"
+  description = "Name for the EKS cluster [suggested: sym-search-dev-*]"
+  type        = "string"
 }
 
 variable "public-key" {
@@ -16,7 +16,7 @@ variable "public-key" {
 }
 
 variable "data_node_instante_type" {
-  default = "c5.2xlarge"
+  default = "c5.xlarge"
 }
 
 variable "min_num_data_nodes" {
@@ -32,7 +32,7 @@ variable "desired_num_data_nodes" {
 }
 
 variable "master_node_instante_type" {
-  default = "c5.xlarge"
+  default = "c5.large"
 }
 
 variable "min_num_master_nodes" {
@@ -66,5 +66,5 @@ variable "max_num_service_nodes" {
 }
 
 variable "desired_num_service_nodes" {
-  default = 2
+  default = 1
 }
