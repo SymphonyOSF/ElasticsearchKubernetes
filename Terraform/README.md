@@ -26,7 +26,7 @@ The execution of the terraform scripts will create the following:
 
 #### Network module
 1. VPC in the desired region.
-2. N subnets in the created VPC, each on a different availability zone.
+2. N(custom #) of subnets in the created VPC, each on a different availability zone.
 3. Internet gateway for the VPC.
 4. Route table for the VPC.
 
@@ -37,7 +37,12 @@ The execution of the terraform scripts will create the following:
 
 #### Eks node group module
 1. EKS managed node group.
-2. Security group that allows ssh access to all nodes from the office.
+2. Security group that allows SSH access to all nodes from the office.
 
 #### SSH key
 1. SSH key resource used for accessing all nodes created by the **eks managed node groups**.
+
+#### IAM Resources
+
+1. ${CLUSTER_NAME}_access_role: Role that allows other AWS users to access the created EKS cluster.
+2. ${CLUSTER_NAME}_master_users: IAM Group (initially empty) containing the necessary permissions to assume the above role, which enables any of its members to be master users of the newly created EKS cluster. 
