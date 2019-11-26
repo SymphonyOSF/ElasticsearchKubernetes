@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Bold and normal font modifiers
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+
 # $1: Input to verify
 function verify_input_is_number() {
     if [[ ! $1 =~ ^[0-9]+$ ]] ; then
@@ -43,10 +47,9 @@ ytt --data-value "cluster_name=$CLUSTER_NAME" \
 
 #Apply generated resource file on K8S
 kubectl apply -f "$CLUSTER_NAME.yml"
-
-echo "Your new cluster is called: ${CLUSTER_NAME}"
 echo "Retrieving information..."
 sleep 10
-echo "Password for elastic user:"
-kubectl get secret "$CLUSTER_NAME-es-elastic-user" -o=jsonpath='{.data.elastic}' | base64 --decode
+echo "${BOLD}New cluster name:${NORMAL} ${CLUSTER_NAME}"
+echo "${BOLD}Password for elastic user:${NORMAL} $(kubectl get secret "$CLUSTER_NAME-es-elastic-user" -o=jsonpath='{.data.elastic}' | base64 --decode)"
+echo "Finished execution."
 echo ""
