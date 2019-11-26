@@ -1,70 +1,84 @@
-variable "environment-tag" {
-  default = "dev"
-}
-
-variable "region" {
-  default = "us-east-1"
-}
-
-variable "cluster-name" {
-  description = "Name for the EKS cluster [suggested: sym-search-dev-*]"
+variable "environment_tag" {
+  description = "Environment tag"
   type        = "string"
 }
 
-variable "public-key" {
-  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXx55LPxZMkO+KNYovPrF6ghA5apRWqS+F5Uutz1Vq5EpbgJiclZN1QvExxAdGoyue0mT3EGrWcww4X1RuAUFc7yQFYaBgfVpUm4P5HBnO695WMDYYum1Dy+Tkfn/NoK9+XxY6nMSxT1R/tODcyId+boaFeAHNH//8FyE57P6JSQq/UpWWCKcV0+Gjo4uio8WeSS0hwGbchzxbB+7XQw0JmWFFPqq8DRxZUb7sesAIUknUIf7lDzQ+juagIpQ9SO7lr35G2VQLPJm8dB7djwx9vsFzw0CoMZZgQH/k2LHYJzz0gtzWCVT2lQ1RFsaKGnaCuPNIHnOm2q0MRLhILH2F"
+variable "region" {
+  description = "AWS region"
+  type        = "string"
 }
 
-variable "data_node_instante_type" {
-  default = "c5.xlarge"
+variable "cluster_name" {
+  description = "Name for the EKS cluster [suggested: sym_search_dev_*]"
+  type        = "string"
 }
 
-variable "min_num_data_nodes" {
-  default = 1
-}
-
-variable "max_num_data_nodes" {
-  default = 60
-}
-
-variable "desired_num_data_nodes" {
-  default = 1
-}
-
-variable "master_node_instante_type" {
-  default = "c5.large"
-}
-
-variable "min_num_master_nodes" {
-  default = 1
-}
-
-variable "max_num_master_nodes" {
-  default = 30
-}
-
-variable "desired_num_master_nodes" {
-  default = 1
+variable "public_key" {
+  description = "Public key used for SSH connection. Format must be: ssh-rsa AAAAB3...."
+  type        = "string"
 }
 
 variable "num_availability_zones" {
-  default = 2
+  description = "Number of availability zones to be created inside the VPC"
+  type        = number
 }
 
-//Service node conf
+variable "data_node_instante_type" {
+  description = "EC2 instance type to be used on the Elasticsearch data nodes"
+  type        = "string"
+}
+
+variable "min_num_data_nodes" {
+  description = "Auto scaling group min number of nodes"
+  type        = number
+}
+
+variable "max_num_data_nodes" {
+  description = "Auto scaling group max number of nodes"
+  type        = number
+}
+
+variable "desired_num_data_nodes" {
+  description = "Auto scaling group desired number of nodes"
+  type        = number
+}
+
+variable "master_node_instante_type" {
+  description = "EC2 instance type to be used on the Elasticsearch master nodes"
+  type        = "string"
+}
+
+variable "min_num_master_nodes" {
+  description = "Auto scaling group min number of nodes"
+  type        = number
+}
+
+variable "max_num_master_nodes" {
+  description = "Auto scaling group max number of nodes"
+  type        = number
+}
+
+variable "desired_num_master_nodes" {
+  description = "Auto scaling group desired number of nodes"
+  type        = number
+}
 
 variable "service_node_instante_type" {
-  default = "t3.small"
+  description = "EC2 instance type to be used on the service nodes"
+  type        = "string"
 }
 
 variable "min_num_service_nodes" {
-  default = 1
+  description = "Auto scaling group min number of nodes"
+  type        = number
 }
 
 variable "max_num_service_nodes" {
-  default = 30
+  description = "Auto scaling group max number of nodes"
+  type        = number
 }
 
 variable "desired_num_service_nodes" {
-  default = 1
+  description = "Auto scaling group desired number of nodes"
+  type        = number
 }
