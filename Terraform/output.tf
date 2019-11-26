@@ -7,7 +7,7 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: ${aws_iam_role.worker-iam.arn}
+    - rolearn: ${aws_iam_role.worker.arn}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
@@ -21,4 +21,8 @@ CONFIGMAPAWSAUTH
 
 output "config_map_aws_auth" {
   value = local.config_map_aws_auth
+}
+
+output "USER_ARN" {
+  value = aws_iam_role.eks_access_role.arn
 }

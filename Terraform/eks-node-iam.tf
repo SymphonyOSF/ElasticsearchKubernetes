@@ -1,6 +1,6 @@
 //This file has to exist in the base directory as it has to be the same for all nodes.
-resource "aws_iam_role" "worker-iam" {
-  name = "${var.cluster-name}_node_iam"
+resource "aws_iam_role" "worker" {
+  name = "${var.cluster_name}_node_iam"
 
   assume_role_policy = <<POLICY
 {
@@ -19,7 +19,7 @@ POLICY
 }
 
 resource "aws_iam_policy" "worker_auto_scale_policy" {
-  name        = "${var.cluster-name}_worker_auto_scale_policy"
+  name        = "${var.cluster_name}_worker_auto_scale_policy"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -43,7 +43,7 @@ EOF
 }
 
 resource "aws_iam_policy" "worker_dns_change_policy" {
-  name        = "${var.cluster-name}_worker_dns_change_policy"
+  name        = "${var.cluster_name}_worker_dns_change_policy"
   policy = <<EOF
 {
  "Version": "2012-10-17",
@@ -73,7 +73,7 @@ EOF
 }
 
 resource "aws_iam_policy" "s3_policy" {
-  name = "${var.cluster-name}_s3_policy"
+  name = "${var.cluster_name}_s3_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -90,37 +90,37 @@ resource "aws_iam_policy" "s3_policy" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerS3Policy" {
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerS3Policy" {
   policy_arn = aws_iam_policy.s3_policy.arn
-  role       = aws_iam_role.worker-iam.name
+  role       = aws_iam_role.worker.name
 }
 
-resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerDnsPolicy" {
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerDnsPolicy" {
   policy_arn = aws_iam_policy.worker_dns_change_policy.arn
-  role       = aws_iam_role.worker-iam.name
+  role       = aws_iam_role.worker.name
 }
 
-resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerAutoScalePolicy" {
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerAutoScalePolicy" {
   policy_arn = aws_iam_policy.worker_auto_scale_policy.arn
-  role       = aws_iam_role.worker-iam.name
+  role       = aws_iam_role.worker.name
 }
 
-resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKSWorkerNodePolicy" {
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.worker-iam.name
+  role       = aws_iam_role.worker.name
 }
 
-resource "aws_iam_role_policy_attachment" "worker-node-AmazonEKS_CNI_Policy" {
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.worker-iam.name
+  role       = aws_iam_role.worker.name
 }
 
-resource "aws_iam_role_policy_attachment" "worker-node-AmazonEC2ContainerRegistryReadOnly" {
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.worker-iam.name
+  role       = aws_iam_role.worker.name
 }
 
-resource "aws_iam_instance_profile" "worker-instance-profile" {
-  name = "${var.cluster-name}-worker-instance-profile"
-  role = aws_iam_role.worker-iam.name
+resource "aws_iam_instance_profile" "worker_instance_profile" {
+  name = "${var.cluster_name}_worker_instance_profile"
+  role = aws_iam_role.worker.name
 }
