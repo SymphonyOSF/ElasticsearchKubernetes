@@ -25,7 +25,7 @@ EOF
 }
 
 resource "aws_iam_policy" "assume_role_policy" {
-  name        = "${var.cluster-name}_assume_role_policy"
+  name        = "${var.cluster_name}_assume_role_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -41,7 +41,7 @@ EOF
 }
 
 resource "aws_iam_policy" "describe_eks_policy" {
-  name        = "${var.cluster-name}_describe_eks_policy"
+  name        = "${var.cluster_name}_describe_eks_policy"
   policy = <<EOF
 {
     "Version": "2012-10-17",

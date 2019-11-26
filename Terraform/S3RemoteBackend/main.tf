@@ -3,16 +3,16 @@ terraform {
 }
 
 provider "aws" {
-  version = ">= 2.28.1"
+  version = ">= 2.38.0"
   region  = var.region
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "search-dev-terraform-backend"
+  bucket = var.s3_bucket_name
 }
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
-  name           = "sym-search-dev-terraform-lock"
+  name           = var.dynamodb_table_lock_name
   read_capacity  = 5
   write_capacity = 5
   hash_key       = "LockID"

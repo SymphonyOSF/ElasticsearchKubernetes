@@ -1,8 +1,8 @@
-variable "worker-asg-name" {}
+variable "worker_asg_name" {}
 
-variable "sym-search-subnet-ids" {}
+variable "sym_search_subnet_ids" {}
 
-variable "cluster-name" {}
+variable "cluster_name" {}
 
 variable "desired_capacity" {}
 
@@ -14,7 +14,7 @@ variable "min_size" {}
 
 variable "ssh_keyname" {}
 
-variable "environment-tag" {}
+variable "environment_tag" {}
 
 variable "vpc_id" {}
 
