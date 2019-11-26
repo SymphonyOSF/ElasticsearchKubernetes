@@ -23,6 +23,10 @@ output "config_map_aws_auth" {
   value = local.config_map_aws_auth
 }
 
-output "USER_ARN" {
+output "CLUSTER_NAME" {
+  value = module.eks_cluster.eks_cluster_name
+}
+
+output "CLUSTER_AUTH_ROLE_ARN" {
   value = aws_iam_role.eks_access_role.arn
 }
