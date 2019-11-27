@@ -16,22 +16,17 @@ catch() {
   fi
 }
 
-CLUSTER_NAME=$1
-if [[ -z "$1" ]]; then
-    #Get cluster name
-    read -r -p "Enter EKS cluster name: " input
-    CLUSTER_NAME=${input}
-fi
-
-#Change kubectl authentication conf to match the K8S master
-aws eks update-kubeconfig --name ${CLUSTER_NAME}
-
 #Regenerate the config_map file for K8S to discover worker nodes
+#Get cluster_name and service_instance_type from terraform output.
 true | tee ./config_map_aws_auth.yml
 cd ../Terraform/
 terraform output config_map_aws_auth >> ../Kubernetes/config_map_aws_auth.yml
 SERVICE_INSTANCE_TYPE=$(terraform output service_instance_type)
+CLUSTER_NAME=$(terraform output cluster_name)
 cd ../Kubernetes
+
+#Change kubectl authentication conf to match the K8S master
+aws eks update-kubeconfig --name "${CLUSTER_NAME}"
 
 #Apply config_map file to K8S, this will allow the control plane discover worker nodes
 kubectl apply -f ./config_map_aws_auth.yml
