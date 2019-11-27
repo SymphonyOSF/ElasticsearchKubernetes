@@ -19,14 +19,18 @@ data:
 CONFIGMAPAWSAUTH
 }
 
+output "service_instance_type" {
+  value = var.service_node_instante_type
+}
+
 output "config_map_aws_auth" {
   value = local.config_map_aws_auth
 }
 
-output "CLUSTER_NAME" {
+output "cluster_name" {
   value = module.eks_cluster.eks_cluster_name
 }
 
-output "CLUSTER_AUTH_ROLE_ARN" {
+output "cluster_auth_role_arn" {
   value = aws_iam_role.eks_access_role.arn
 }

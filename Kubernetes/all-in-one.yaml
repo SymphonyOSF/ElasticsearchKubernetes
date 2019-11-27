@@ -3019,7 +3019,7 @@ spec:
     spec:
       serviceAccountName: elastic-operator
       nodeSelector:
-        beta.kubernetes.io/instance-type: t3.small
+        beta.kubernetes.io/instance-type: SERVICE_INSTANCE_TYPE
       containers:
         - image: docker.elastic.co/eck/eck-operator:1.0.0-beta1
           name: manager
