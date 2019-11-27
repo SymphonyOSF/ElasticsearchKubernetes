@@ -1,4 +1,4 @@
-FROM luisplazas/eks-deploy
+FROM luisplazas/deploy-base
 ARG DEBIAN_FRONTEND=noninteractive
 
 # YTT installation
@@ -10,7 +10,6 @@ RUN apt-get install libdigest-sha-perl -y \
     && chmod +x ${dst_dir}/ytt \
     && ytt version
 
-# Copy Kubernetes and Elasticsearch files
-RUN rm -rf /root/Kubernetes
+# Copy Connection and Elasticsearch files
 COPY ./ESClusterDeployment      /root/ESClusterDeployment
 COPY ./configure_connection.sh  /root/configure_connection.sh

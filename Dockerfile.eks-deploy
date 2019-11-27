@@ -1,27 +1,10 @@
-FROM ubuntu:18.04
+FROM luisplazas/deploy-base
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Python3 and Pip installation
-RUN apt-get update \
-    && apt-get install jq -y \
-    && apt-get install apt-utils -y \
-    && apt-get install apt-transport-https -y \
-    && apt-get install python3  -y \
-    && python3 --version \
-    && apt-get install python3-distutils -y \
-    && apt-get install curl -y \
-    && apt-get install wget -y \
-    && curl -O https://bootstrap.pypa.io/get-pip.py \
-    && python3 get-pip.py
-
-# AWS cli installation
-RUN pip3 install awscli --upgrade \
-    && aws --version
-
-# Kubectl installation
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl \
-    && chmod +x ./kubectl \
-    && mv ./kubectl /usr/local/bin/kubectl
+#Terraform installation
+RUN wget https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.16_linux_amd64.zip \
+    && unzip ./terraform_0.12.16_linux_amd64.zip -d /usr/local/bin/
 
 # Copy Kubernetes bootstrap folder
 COPY ./Kubernetes       /root/Kubernetes
+COPY ./Terraform        /root/Terraform
