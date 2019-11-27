@@ -36,7 +36,7 @@ cd ../Kubernetes
 #Apply config_map file to K8S, this will allow the control plane discover worker nodes
 kubectl apply -f ./config_map_aws_auth.yml
 
-#Install AWS auto-scaler. Replace name and instance_type
+#Install AWS auto-scaler. Replace cluster_name and service_instance_type
 sed "s/NEW_CLUSTER_NAME/${CLUSTER_NAME}/g" cluster-autoscaler-autodiscover.yaml \
     | sed -E "s/SERVICE_INSTANCE_TYPE/${SERVICE_INSTANCE_TYPE}/g" \
     | kubectl apply -f -
@@ -59,5 +59,6 @@ kubectl apply -f ./Dashboard/dashboard-user.yaml
 
 #-------- /End Kubernetes Dashboard ----------
 
-#Configure the elastic operator
-kubectl apply -f ./all-in-one.yaml
+#Configure the elastic operator. Replace instance_type and service_instance_type
+sed "s/SERVICE_INSTANCE_TYPE/${SERVICE_INSTANCE_TYPE}/g" all-in-one.yaml \
+    | kubectl apply -f -
