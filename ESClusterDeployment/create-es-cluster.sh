@@ -20,7 +20,7 @@ verify_input_is_number ${input}
 MASTER_NODE_COUNT=${input}
 
 #Get desired number of data nodes
-echo "Data nodes count (integer)"
+echo "Data nodes count (per AZ)(integer)"
 read -r -p "Input: " input
 verify_input_is_number ${input}
 DATA_NODE_COUNT=${input}
