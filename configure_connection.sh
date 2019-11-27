@@ -2,6 +2,10 @@
 # Exit when any command fails
 set -e
 
+# Bold and normal font modifiers
+bold=$(tput bold)
+normal=$(tput sgr0)
+
 # Trap always the last command executed
 trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
 
@@ -9,7 +13,7 @@ trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
 trap 'catch $?' EXIT
 catch() {
   if [[ "$1" != "0" ]]; then
-    echo "${bold}\"${previous_command}\" command on failed with exit code $1.${normal}"
+    echo "${bold}\"${previous_command}\" command failed with exit code $1.${normal}"
   fi
 }
 
