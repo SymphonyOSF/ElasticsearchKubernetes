@@ -25,20 +25,22 @@ function delete_cluster() {
     kubectl delete -f ./DNS/external_dns.yaml
 }
 
+if [[ $0 != "-y" ]]; then
+    echo "This command will delete ALL Elastic clusters."
+    read -r -p "Are You Sure? [Y/n] " input
 
-echo "This command will delete ALL Elastic clusters."
-read -r -p "Are You Sure? [Y/n] " input
-
-case $input in
-    [yY][eE][sS]|[yY])
- delete_cluster
- ;;
-    [nN][oO]|[nN])
- echo "Cancelling execution."
-       ;;
-    *)
- echo "Invalid input..."
- exit 1
- ;;
-esac
-
+    case $input in
+        [yY][eE][sS]|[yY])
+            delete_cluster
+        ;;
+        [nN][oO]|[nN])
+            echo "Cancelling execution."
+        ;;
+        *)
+     echo "Invalid input..."
+     exit 1
+     ;;
+    esac
+else
+    delete_cluster
+fi

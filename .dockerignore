@@ -3,3 +3,9 @@
 *.terraform.backup
 *.md
 Dockerfile*
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+**/*.tfstate*

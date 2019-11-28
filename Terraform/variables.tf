@@ -1,21 +1,21 @@
 variable "environment_tag" {
   description = "Environment tag"
-  type        = "string"
+  type        = string
 }
 
 variable "region" {
   description = "AWS region"
-  type        = "string"
+  type        = string
 }
 
 variable "cluster_name" {
   description = "Name for the EKS cluster [suggested: sym_search_dev_*]"
-  type        = "string"
+  type        = string
 }
 
 variable "public_key" {
   description = "Public key used for SSH connection. Format must be: ssh-rsa AAAAB3...."
-  type        = "string"
+  type        = string
 }
 
 variable "num_availability_zones" {
@@ -25,7 +25,7 @@ variable "num_availability_zones" {
 
 variable "data_node_instante_type" {
   description = "EC2 instance type to be used on the Elasticsearch data nodes"
-  type        = "string"
+  type        = string
 }
 
 variable "min_num_data_nodes" {
@@ -45,7 +45,7 @@ variable "desired_num_data_nodes" {
 
 variable "master_node_instante_type" {
   description = "EC2 instance type to be used on the Elasticsearch master nodes"
-  type        = "string"
+  type        = string
 }
 
 variable "min_num_master_nodes" {
@@ -65,7 +65,7 @@ variable "desired_num_master_nodes" {
 
 variable "service_node_instante_type" {
   description = "EC2 instance type to be used on the service nodes"
-  type        = "string"
+  type        = string
 }
 
 variable "min_num_service_nodes" {

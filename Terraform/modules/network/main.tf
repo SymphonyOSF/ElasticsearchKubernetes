@@ -22,6 +22,7 @@ resource "aws_subnet" "sym_search_subnet" {
   count = var.num_availability_zones
 
   availability_zone = data.aws_availability_zones.available.names[count.index]
+//  Each subnet gets a total of 4094 IP addresses (K8S is ip intensive, better to have more than enough)
   cidr_block        = "10.0.${count.index * 16}.0/20"
   vpc_id            = aws_vpc.sym_search_vpc.id
 
