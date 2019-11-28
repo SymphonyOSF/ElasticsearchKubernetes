@@ -3,7 +3,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 #Terraform installation
 RUN wget https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.16_linux_amd64.zip \
-    && unzip ./terraform_0.12.16_linux_amd64.zip -d /usr/local/bin/
+    && unzip ./terraform_0.12.16_linux_amd64.zip -d /usr/local/bin/ \
+    && rm -rf terraform_0.12.16_linux_amd64.zip
 
 # Copy Kubernetes bootstrap folder
 COPY ./Kubernetes       /root/Kubernetes
