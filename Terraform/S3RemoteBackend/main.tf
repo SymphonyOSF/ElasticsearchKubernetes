@@ -9,6 +9,7 @@ provider "aws" {
 
 resource "aws_s3_bucket" "bucket" {
   bucket = var.s3_bucket_name
+  region = var.region
 }
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
