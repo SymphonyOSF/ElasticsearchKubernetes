@@ -1,8 +1,9 @@
 resource "aws_eks_node_group" "node_group" {
+  count = var.node_group_count
   cluster_name    = var.cluster_name
-  node_group_name = var.worker_asg_name
+  node_group_name = "${var.worker_asg_name}${count.index}"
   node_role_arn   = var.node_role_iam_arn
-  subnet_ids      = var.sym_search_subnet_ids
+  subnet_ids      = var.single_az == true ? [var.subnet_ids[count.index % length(var.subnet_ids)]] : var.subnet_ids
   disk_size       = 10
   instance_types  = [var.instance_type]
 

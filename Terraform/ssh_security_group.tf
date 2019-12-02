@@ -1,4 +1,4 @@
-resource "aws_security_group" "node_ssh_sg" {
+resource "aws_security_group" "node_ssh" {
   name        = "office_ssh_sg"
   description = "Security group for allowing ssh to worker nodes"
   vpc_id      = module.eks_network_module.vpc_id
