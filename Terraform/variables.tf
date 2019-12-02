@@ -82,3 +82,14 @@ variable "desired_num_service_nodes" {
   description = "Auto scaling group desired number of nodes"
   type        = number
 }
+
+variable "enable_ssh_access" {
+  description = "Activates/Deactivates SSH access to the nodes (by default allows office access)"
+  type        = bool
+}
+
+variable "ssh_sg_id_list" {
+  description = "In addition to enabling/disabling SSH from the office, you can add extra SG ids that will have access to the 22 port on all the nodes."
+  default = []
+  type        = list(string)
+}

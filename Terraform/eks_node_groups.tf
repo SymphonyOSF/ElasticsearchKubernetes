@@ -1,3 +1,7 @@
+locals {
+  ssh_sg_id_list = concat([aws_security_group.node_ssh_sg], var.ssh_sg_id_list)
+}
+
 module "data_node_workers_1" {
   source                                      = "./modules/eks_node_group"
   worker_asg_name                             = "data_node_workers_1"
@@ -11,7 +15,10 @@ module "data_node_workers_1" {
   environment_tag                             = var.environment_tag
   node_role_iam_arn                           = aws_iam_role.worker.arn
   vpc_id                                      = module.eks_network_module.vpc_id
+  enable_ssh_access                           = var.enable_ssh_access
+  ssh_sg_id_list                              = local.ssh_sg_id_list
 }
+
 
 module "data_node_workers_2" {
   source                                      = "./modules/eks_node_group"
@@ -26,6 +33,8 @@ module "data_node_workers_2" {
   environment_tag                             = var.environment_tag
   node_role_iam_arn                           = aws_iam_role.worker.arn
   vpc_id                                      = module.eks_network_module.vpc_id
+  enable_ssh_access                           = var.enable_ssh_access
+  ssh_sg_id_list                              = local.ssh_sg_id_list
 }
 
 module "master_node_workers" {
@@ -41,6 +50,8 @@ module "master_node_workers" {
   environment_tag                             = var.environment_tag
   node_role_iam_arn                           = aws_iam_role.worker.arn
   vpc_id                                      = module.eks_network_module.vpc_id
+  enable_ssh_access                           = var.enable_ssh_access
+  ssh_sg_id_list                              = local.ssh_sg_id_list
 }
 
 module "service_node_workers" {
@@ -56,4 +67,6 @@ module "service_node_workers" {
   environment_tag                             = var.environment_tag
   node_role_iam_arn                           = aws_iam_role.worker.arn
   vpc_id                                      = module.eks_network_module.vpc_id
+  enable_ssh_access                           = var.enable_ssh_access
+  ssh_sg_id_list                              = local.ssh_sg_id_list
 }

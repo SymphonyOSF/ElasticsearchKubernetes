@@ -21,3 +21,5 @@ service_node_instante_type  = "t3.small"
 min_num_service_nodes       = 1
 max_num_service_nodes       = 30
 desired_num_service_nodes   = 1
+
+enable_ssh_access           = true
