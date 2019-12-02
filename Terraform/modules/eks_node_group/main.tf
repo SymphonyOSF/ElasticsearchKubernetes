@@ -6,10 +6,15 @@ resource "aws_eks_node_group" "node_group" {
   disk_size       = 10
   instance_types  = [var.instance_type]
 
-  remote_access {
-    ec2_ssh_key               = var.ssh_keyname
-    // IMPORTANT: If source_security_group_ids is left empty, ssh access will be open to 0.0.0.0/0.
-    source_security_group_ids = [aws_security_group.worker_ssg_sg.id]
+
+  dynamic "remote_access" {
+    // Little hack, if there are security_groups defined on the list, will create this block once.
+    // If there is no security_groups defined, will not create this block at all.
+    for_each = var.enable_ssh_access == true && length(var.ssh_sg_id_list) >= 1  ? [1] : []
+    content {
+      ec2_ssh_key               = var.ssh_keyname
+      source_security_group_ids = var.ssh_sg_id_list
+    }
   }
 
   scaling_config {
