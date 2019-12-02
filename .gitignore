@@ -1,7 +1,8 @@
 #Ignore .DS_Store
 *.DS_Store
 
-config_map_aws_auth.yml
+#Ignore automatically generated config map
+Kubernetes/config_map_aws_auth.yml
 
 # Ignore all certificate files
 *.pem
