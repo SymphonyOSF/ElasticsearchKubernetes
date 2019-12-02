@@ -28,6 +28,11 @@ variable "data_node_instante_type" {
   type        = string
 }
 
+variable "num_data_node_groups" {
+  description = "Number of node groups to be created. Each on a single availability zone."
+  type        = number
+}
+
 variable "min_num_data_nodes" {
   description = "Auto scaling group min number of nodes"
   type        = number
@@ -90,6 +95,6 @@ variable "enable_ssh_access" {
 
 variable "ssh_sg_id_list" {
   description = "In addition to enabling/disabling SSH from the office, you can add extra SG ids that will have access to the 22 port on all the nodes."
-  default = []
+  default     = [""]
   type        = list(string)
 }

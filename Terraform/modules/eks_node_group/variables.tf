@@ -1,6 +1,6 @@
 variable "worker_asg_name" {}
 
-variable "sym_search_subnet_ids" {}
+variable "subnet_ids" {}
 
 variable "cluster_name" {}
 
@@ -22,8 +22,18 @@ variable "node_role_iam_arn" {}
 
 variable "enable_ssh_access" {}
 
+variable "node_group_count" {
+  type        = number
+  description = "Number of nodegroups to create, 1 by default"
+  default     = 1
+}
+
+variable "single_az" {
+  type        = bool
+  description = "Indicates whether the nodegroup should be spawned on a single AZ"
+}
+
 variable "ssh_sg_id_list" {
-  default = []
   description = "List containing the IDs of the security groups allowed for SSH, by default, empty = no ssh access from anywhere."
-  type = list(string)
+  type        = list(string)
 }
