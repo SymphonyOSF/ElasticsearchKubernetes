@@ -29,7 +29,7 @@ Once you have satisfied all the previously defined requirements, execute the fol
 
 #### 1. Run and SSH into the container with all the dependencies by executing 
 ```bash
-$ docker run -it luisplazas/elasticdeployment 
+$ docker run -it luisplazas/elastic-deploy 
 ```
 (Optional) You can see the contents of this image and build it locally with it's [Dockerfile](https://github.com/SymphonyOSF/ElasticsearchKubernetes/blob/master/Dockerfile.deploy)
 
