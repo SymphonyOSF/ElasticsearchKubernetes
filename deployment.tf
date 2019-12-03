@@ -41,3 +41,7 @@ terraform {
 provider "aws" {
   version = ">= 2.38.0"
 }
+
+output "eks_cluster_output" {
+  value = module.eks_cluster
+}
