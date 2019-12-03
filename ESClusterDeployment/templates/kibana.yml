@@ -33,20 +33,13 @@ spec:
         annotations:
           #! Must be a string
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
-          external-dns.alpha.kubernetes.io/hostname: sym-search-dev-kibana.devi.symphony.com
+          service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: #@ data.values.elb.elastic.extraSecurityGroupIds
+          #! external-dns.alpha.kubernetes.io/hostname: sym-search-dev-kibana.devi.symphony.com
       spec:
         type: LoadBalancer
         selector:
           sym-node-type: #@ str(data.values.cluster_name) +"-kibana-node"
-        loadBalancerSourceRanges:
-          - 208.184.224.194/32
-          - 64.79.115.2/32
-          - 35.239.150.121/32
-          - 35.188.142.59/32
-          - 35.225.119.41/32
-          - 35.227.18.124/32
-          - 35.227.87.44/32
-          - 35.237.136.190/32
+        loadBalancerSourceRanges: #@ data.values.elb.kibana.loadBalancerSourceRanges
 #!    tls:
 #!      certificate:
 #!        secretName: my-cert
