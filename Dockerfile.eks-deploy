@@ -8,4 +8,4 @@ RUN wget https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.16_linu
 
 # Copy Kubernetes bootstrap folder
 COPY ./Kubernetes       /root/Kubernetes
-COPY ./Terraform        /root/Terraform
+COPY ./deployment.tf    /root/deployment.tf
