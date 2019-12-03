@@ -10,3 +10,7 @@ docker build . -f ./Dockerfile.eks-deploy -t luisplazas/eks-deploy
 #Build elastic deployment image
 docker build . -f ./Dockerfile.elastic-deploy -t luisplazas/elastic-deploy
 #docker push luisplazas/elastic-deploy
+
+docker build . -f ./Dockerfile.elastic -t elastic:7.4.2
+
+#docker push luisplazas/elastic:7.4.2
