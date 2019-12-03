@@ -5,22 +5,23 @@ kind: Elasticsearch
 metadata:
   name: #@ data.values.cluster_name
 spec:
-  version: 7.4.2
+  version: #@ data.values.version
   #! Custom image with repository-s3 and discovery-ec2 plugins installed on top of the official Elastic image.
-  #! Github link:
-  image: luisplazas/elastic:7.4.2
+  #! Github link: https://github.com/SymphonyOSF/ElasticsearchKubernetes/blob/master/Dockerfile.elastic
+  image: #@ data.values.image
   nodeSets:
     - name: master
       count: #@ int(int(data.values.node_configuration.master.count))
       volumeClaimTemplates:
         - metadata:
+            #!           Name must always be elasticsearch-data
             name: elasticsearch-data
           spec:
             accessModes:
               - ReadWriteOnce
             resources:
               requests:
-                storage: 12G
+                storage: #@ data.values.node_configuration.master.storage_size
             storageClassName: gp2
       config:
         node.master: true
@@ -49,7 +50,8 @@ spec:
                 limits:
                   memory: 3.45Gi
                   cpu: 2
-    - name: data1
+    #@ for index in range(0, data.values.data_node_group_count):
+    - name: #@ "data-"+ str(index)
       count: #@ int(int(data.values.node_configuration.data.count))
       volumeClaimTemplates:
         - metadata:
@@ -91,72 +93,20 @@ spec:
                 limits:
                   memory: 7.45Gi
                   cpu: 4
-
-    - name: data2
-      count: #@ int(int(data.values.node_configuration.data.count))
-      volumeClaimTemplates:
-        - metadata:
-            #!           Name must always be elasticsearch-data
-            name: elasticsearch-data
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: #@ data.values.node_configuration.data.storage_size
-            storageClassName: gp2
-      config:
-        node.master: false
-        node.data: true
-        node.ingest: false
-        node.ml: false
-        bootstrap.memory_lock: false
-      podTemplate:
-        metadata:
-          labels:
-            sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
-        spec:
-          initContainers:
-            - name: sysctl
-              securityContext:
-                privileged: true
-              command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
-          nodeSelector:
-            beta.kubernetes.io/instance-type: c5.xlarge
-          containers:
-            - name: elasticsearch
-              imagePullPolicy: Always
-              #!specify resource limits and requests
-              resources:
-                requests:
-                  memory: 6Gi
-                  cpu: 3
-                limits:
-                  memory: 7.45Gi
-                  cpu: 4
+    #@ end
   http:
     service:
       metadata:
         annotations:
           #!Must be a string
+          service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: #@ data.values.elb.elastic.extraSecurityGroupIds
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
 #!         external-dns.alpha.kubernetes.io/hostname: sym-search-dev-elastic.devi.symphony.com
       spec:
         type: LoadBalancer
         selector:
           sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
-        loadBalancerSourceRanges:
-          - 208.184.224.194/32
-          - 64.79.115.2/32
-          - 35.239.150.121/32
-          - 35.188.142.59/32
-          - 35.225.119.41/32
-          - 35.227.18.124/32
-          - 35.227.87.44/32
-          - 35.237.136.190/32
-#!   tls:
-#!     selfSignedCertificate:
-#!       disabled: true
+        loadBalancerSourceRanges: #@ data.values.elb.elastic.loadBalancerSourceRanges
     tls:
      certificate:
-       secretName: my-cert
+       secretName: #@ data.values.tls.k8sSecretName
