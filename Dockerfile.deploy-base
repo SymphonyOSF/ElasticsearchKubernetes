@@ -10,6 +10,7 @@ RUN apt-get update \
     && apt-get install curl -y \
     && apt-get install wget -y \
     && apt-get install unzip -y \
+    && apt-get install git -y \
     && apt-get install nano
 
 # Python3 and Pip installation
