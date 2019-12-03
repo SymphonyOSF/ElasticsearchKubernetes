@@ -1,11 +1,11 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_group" "eks_cluster_masters" {
-  name = "${module.eks_cluster.eks_cluster_name}_master_users"
+  name = "${var.eks_cluster_name}_master_users"
 }
 
 resource "aws_iam_role" "eks_access_role" {
-  name = "${module.eks_cluster.eks_cluster_name}_access_role"
+  name = "${var.eks_cluster_name}_access_role"
 
   assume_role_policy = <<EOF
 {
@@ -25,7 +25,7 @@ EOF
 }
 
 resource "aws_iam_policy" "assume_role_policy" {
-  name        = "${var.cluster_name}_assume_role_policy"
+  name        = "${var.eks_cluster_name}_assume_role_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -41,7 +41,7 @@ EOF
 }
 
 resource "aws_iam_policy" "describe_eks_policy" {
-  name        = "${var.cluster_name}_describe_eks_policy"
+  name        = "${var.eks_cluster_name}_describe_eks_policy"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -49,7 +49,7 @@ resource "aws_iam_policy" "describe_eks_policy" {
         {
             "Effect": "Allow",
             "Action": "eks:DescribeCluster",
-            "Resource": "${module.eks_cluster.eks_cluster_arn}"
+            "Resource": "${var.eks_cluster_arn}"
         }
     ]
 }

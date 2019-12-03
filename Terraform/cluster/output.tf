@@ -7,13 +7,13 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: ${aws_iam_role.worker.arn}
+    - rolearn: ${module.iam.worker_role_arn}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
         - system:nodes
-    - rolearn: ${aws_iam_role.eks_access_role.arn}
-      username: ${aws_iam_role.eks_access_role.name}
+    - rolearn: ${module.iam.access_role_arn}
+      username: ${module.iam.access_role_name}
       groups:
         - system:masters
 CONFIGMAPAWSAUTH
@@ -32,5 +32,5 @@ output "cluster_name" {
 }
 
 output "cluster_auth_role_arn" {
-  value = aws_iam_role.eks_access_role.arn
+  value = module.iam.access_role_arn
 }
