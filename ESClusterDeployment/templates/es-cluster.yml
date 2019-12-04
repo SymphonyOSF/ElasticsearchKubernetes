@@ -28,11 +28,20 @@ spec:
         node.data: false
         node.ingest: false
         node.ml: false
+        cluster.routing.allocation.awareness.attributes: zone
       podTemplate:
         metadata:
           labels:
             sym-node-type: #@ str(data.values.cluster_name) +"-master-node"
         spec:
+          affinity:
+            podAntiAffinity: #! Pod affinity guarantees a single pod per node
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
+                  topologyKey: kubernetes.io/hostname
           initContainers:
             - name: sysctl
               securityContext:
@@ -50,19 +59,19 @@ spec:
                 limits:
                   memory: 3.45Gi
                   cpu: 2
-    #@ for index in range(0, data.values.data_node_group_count):
-    - name: #@ "data-"+ str(index)
-      count: #@ int(int(data.values.node_configuration.data.count))
+    #@ for data_group in data.values.node_configuration.data:
+    - name: #@ "data-"+ str(data_group.zone_name)
+      count: #@ int(int(data_group.count))
       volumeClaimTemplates:
         - metadata:
-            #!           Name must always be elasticsearch-data
+            #! Name must always be elasticsearch-data
             name: elasticsearch-data
           spec:
             accessModes:
               - ReadWriteOnce
             resources:
               requests:
-                storage: #@ data.values.node_configuration.data.storage_size
+                storage: #@ data_group.storage_size
             storageClassName: gp2
       config:
         node.master: false
@@ -70,11 +79,29 @@ spec:
         node.ingest: false
         node.ml: false
         bootstrap.memory_lock: false
+        node.attr.zone: #@ data_group.zone_name
+        cluster.routing.allocation.awareness.attributes: zone
       podTemplate:
         metadata:
           labels:
             sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
         spec:
+          affinity:
+            podAntiAffinity: #! Pod affinity guarantees a single pod per node
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
+                  topologyKey: kubernetes.io/hostname
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: failure-domain.beta.kubernetes.io/zone
+                        operator: In
+                        values:
+                          - #@ data_group.zone_name
           initContainers:
             - name: sysctl
               securityContext:
@@ -107,6 +134,8 @@ spec:
         selector:
           sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
         loadBalancerSourceRanges: #@ data.values.elb.elastic.loadBalancerSourceRanges
+    #@ if data.values.elb.elastic.tls.customCertificate:
     tls:
-     certificate:
-       secretName: #@ data.values.tls.k8sSecretName
+      certificate:
+        secretName: #@ data.values.elb.elastic.tls.k8sSecretName
+    #@ end

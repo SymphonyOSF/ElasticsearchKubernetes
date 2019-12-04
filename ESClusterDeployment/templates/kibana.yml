@@ -40,6 +40,8 @@ spec:
         selector:
           sym-node-type: #@ str(data.values.cluster_name) +"-kibana-node"
         loadBalancerSourceRanges: #@ data.values.elb.kibana.loadBalancerSourceRanges
-#!    tls:
-#!      certificate:
-#!        secretName: my-cert
+    #@ if data.values.elb.kibana.tls.customCertificate:
+    tls:
+      certificate:
+        secretName: #@ data.values.elb.kibana.tls.k8sSecretName
+    #@ end

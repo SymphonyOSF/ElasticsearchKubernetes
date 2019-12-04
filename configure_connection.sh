@@ -24,8 +24,8 @@ normal=$(tput sgr0)
 #Configure aws cli
 aws configure
 
-read -r -p "Enter EKS cluster name [As configured on terraform]: " CLUSTER_NAME
-read -r -p "Enter the role ARN [Obtained from the terraform output]: " ROLE_ARN
+read -r -p "Enter EKS cluster name [Obtained from the terraform output]: " CLUSTER_NAME
+read -r -p "Enter the cluster_auth_role_arn [Obtained from the terraform output]: " ROLE_ARN
 #Configure .kubeconfig for kubectl to point to the cluster.
 aws eks update-kubeconfig --name ${CLUSTER_NAME} --role-arn ${ROLE_ARN}
 
