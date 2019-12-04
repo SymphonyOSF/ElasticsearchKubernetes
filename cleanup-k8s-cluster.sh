@@ -2,6 +2,8 @@
 
 function delete_cluster() {
     echo "Starting clean up..."
+    cd ./Kubernetes
+
 #    Delete all elasticsearch operator resources
     kubectl get namespaces --no-headers -o custom-columns=:metadata.name | xargs -n1 kubectl delete elastic --all -n
     kubectl delete -f ./all-in-one.yaml
@@ -25,8 +27,8 @@ function delete_cluster() {
     kubectl delete -f ./DNS/external_dns.yaml
 }
 
-if [[ $0 != "-y" ]]; then
-    echo "This command will delete ALL Elastic clusters."
+if [[ $1 != "-y" ]]; then
+    echo "This command will delete ALL Elastic clusters including their data."
     read -r -p "Are You Sure? [Y/n] " input
 
     case $input in

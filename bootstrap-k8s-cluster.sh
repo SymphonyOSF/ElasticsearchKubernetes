@@ -19,7 +19,6 @@ catch() {
 #Regenerate the config_map file for K8S to discover worker nodes
 #Get cluster_name and service_instance_type from terraform output.
 true | tee ./config_map_aws_auth.yml
-cd ../
 terraform output -json eks_cluster_output | jq -r .config_map_aws_auth >> ./Kubernetes/config_map_aws_auth.yml
 SERVICE_INSTANCE_TYPE=$(terraform output -json eks_cluster_output | jq -r .service_instance_type)
 CLUSTER_NAME=$(terraform output -json eks_cluster_output | jq -r .cluster_name)
