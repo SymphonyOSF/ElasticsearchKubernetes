@@ -28,11 +28,20 @@ spec:
         node.data: false
         node.ingest: false
         node.ml: false
+        cluster.routing.allocation.awareness.attributes: zone
       podTemplate:
         metadata:
           labels:
             sym-node-type: #@ str(data.values.cluster_name) +"-master-node"
         spec:
+          affinity:
+            podAntiAffinity: #! Pod affinity guarantees a single pod per node
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
+                  topologyKey: kubernetes.io/hostname
           initContainers:
             - name: sysctl
               securityContext:
@@ -70,6 +79,7 @@ spec:
         node.ingest: false
         node.ml: false
         bootstrap.memory_lock: false
+        node.attr.zone: #@ data.values.node_configuration.data.storage_size
       podTemplate:
         metadata:
           labels:
