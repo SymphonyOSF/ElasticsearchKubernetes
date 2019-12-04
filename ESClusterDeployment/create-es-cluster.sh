@@ -5,10 +5,7 @@ BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
 #Get desired cluster name
-read -r -p "${BOLD}Enter cluster name (must not be another cluster with the same name):${NORMAL} " CLUSTER_NAME
-
-#Create SSL secret for the cluster
-#kubectl create secret generic "$CLUSTER_NAME-certificate" --from-file=tls.crt=./Certificate/cert.pem --from-file=tls.key=./Certificate/key.key --from-file=ca.crt=./Certificate/ca.pem
+read -r -p "${BOLD}Enter cluster name (Unique and MUST conform with dns naming conventions):${NORMAL} " CLUSTER_NAME
 
 #Generate ES and Kibana resource file from the template.
 ytt --data-value "cluster_name=$CLUSTER_NAME" \
