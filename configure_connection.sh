@@ -8,7 +8,6 @@ normal=$(tput sgr0)
 
 # Trap always the last command executed
 trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
-
 #trap all errors
 trap 'catch $?' EXIT
 catch() {
