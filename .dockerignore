@@ -9,7 +9,7 @@ Dockerfile*
 
 # .tfstate files
 **/*.tfstate*
-./ESClusterDeployment/*.yml
+ ./ESClusterDeployment/templates
 **/Certificate
 **/logs.sh
 **/proxy-http.sh

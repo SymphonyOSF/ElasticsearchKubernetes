@@ -52,5 +52,5 @@ COPY ./bootstrap-k8s-cluster.sh    /root/EKS/bootstrap-k8s-cluster.sh
 COPY ./cleanup-k8s-cluster.sh      /root/EKS/cleanup-k8s-cluster.sh
 
 RUN mkdir /root/Elastic
-COPY ./ESClusterDeployment         /root/Elastic/ESClusterDeployment
-COPY ./configure_connection.sh     /root/Elastic/configure_connection.sh
+COPY ./ESClusterDeployment         /root/Elastic/
+COPY ./configure_connection.sh     /root/configure_connection.sh
