@@ -37,5 +37,5 @@ echo "Waiting 10s to retrieve DNS information..."
 sleep 10
 echo "${BOLD}Elastic ELB DNS:${NORMAL} $(kubectl get svc/"${CLUSTER_NAME}"-es-http -o json | jq .status.loadBalancer.ingress[0].hostname)"
 echo "${BOLD}Kibana ELB DNS: ${NORMAL} $(kubectl get svc/kibana-"${CLUSTER_NAME}"-kb-http -o json | jq .status.loadBalancer.ingress[0].hostname)"
-echo "${BOLD}You can start query the services in 2-3 minutes ${NORMAL}"
+echo "${BOLD}You can start querying the services in 2-3 minutes ${NORMAL}"
 echo "Finished cluster creation successfully."
