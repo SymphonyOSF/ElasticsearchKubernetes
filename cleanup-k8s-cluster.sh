@@ -2,6 +2,8 @@
 
 function delete_cluster() {
     echo "Starting clean up..."
+#    CD into the folder containing this script
+    cd "${0%/*}"
     cd ./Kubernetes
 
 #    Delete all elasticsearch operator resources

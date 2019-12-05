@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+#CD into the directory containing this script
+cd "${0%/*}"
 
 # Bold and normal font modifiers
 bold=$(tput bold)
