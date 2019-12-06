@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.terraform/modules/eks_cluster" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Terraform/examples/single-az-example/.terraform/modules/eks_cluster" vcs="Git" />
   </component>
 </project>
