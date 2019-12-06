@@ -45,3 +45,7 @@ provider "aws" {
 output "eks_cluster_output" {
   value = module.eks_cluster
 }
+
+output "REMINDER" {
+  value = "\n**************************************************\n**************************************************\nREMEMBER TO BOOTSTRAP THE EKS CLUSTER BEFORE YOU START DEPLOYING ELASTICSEARCH CLUSTERS\n**************************************************\n**************************************************\n"
+}
