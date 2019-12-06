@@ -4,6 +4,7 @@
 
 import os
 import json
+import yaml
 import logging
 import argparse
 import requests
@@ -21,14 +22,10 @@ def init(cluster_name):
     # Record Elasticsearch HTTP Credential
     ES_PASSWORD     = os.popen('kubectl get secret \'' + cluster_name + '-es-elastic-user\'  -o=jsonpath=\'{.data.elastic}\' | base64 --decode').read()
 
-    # List of Elasticsearch Node Names in the cluster
-    NODES_INFO = json.loads(requests.get(ELB_ENDPOINT + '/_cat/nodes?format=json', verify=False, auth=('elastic', ES_PASSWORD)).text)
-    ES_NODES   = [node_info['name'] for node_info in NODES_INFO]
-
     # List of Elasticsearch plugins
     ES_PLUGINS = ('repository-s3', 'discovery-ec2', 'analysis-icu')
 
-    return (ELB_ENDPOINT, KIBANA_ENDPOINT, ES_PASSWORD, ES_NODES, ES_PLUGINS)
+    return (ELB_ENDPOINT, KIBANA_ENDPOINT, ES_PASSWORD, ES_PLUGINS)
 
 
 # Test if Elasticsearch elb endpoint is working
@@ -60,9 +57,41 @@ def test_elasticsearch_status_green(ELB_ENDPOINT, PASSWORD):
         return 0
 
 
+# Test for the correct number of nodes (master + data nodes)
+def test_elasticsearch_num_of_nodes(ES_NODES, PASSWORD, CLUSTER_NAME):
+    logging.info('Testing if the correct number of elasticsearch nodes are up...')
+
+    # Read CLUSTER-NAME.yml file for the true node count
+    node_count_should_be = 0
+    with open(os.getcwd() + '/../ES-Cluster/' + CLUSTER_NAME + '.yml', 'r') as elastic_yml_stream:
+        docs = yaml.load_all(elastic_yml_stream, Loader=yaml.FullLoader)
+        for doc in docs:
+            # Count only ES nodes
+            if doc['kind'] != 'Elasticsearch':
+                continue
+
+            for nodeSet in doc['spec']['nodeSets']:
+                node_count_should_be += nodeSet['count']
+
+
+    response = requests.get(ELB_ENDPOINT + '/_nodes', verify=False, auth=('elastic', PASSWORD))
+    node_count_is = json.loads(response.text)['_nodes']['total']
+
+    if node_count_should_be != node_count_is:
+        logging.error('Number of nodes should be ' + str(node_count_should_be) + ' but is ' + str(node_count_is))
+        return 1
+    else:
+        logging.info('Correct number of nodes are up')
+        return 0
+
+
 # Test if the required plugins are installed
-def test_elasticsearch_plugins(ELB_ENDPOINT, PASSWORD, ES_NODES, ES_PLUGINS):
+def test_elasticsearch_plugins(ELB_ENDPOINT, PASSWORD, ES_PLUGINS):
     logging.info('Testing if Elasticsearch Nodes have the installed plugins...')
+
+    # List of Elasticsearch Node Names in the cluster
+    NODES_INFO = json.loads(requests.get(ELB_ENDPOINT + '/_cat/nodes?format=json', verify=False, auth=('elastic', ES_PASSWORD)).text)
+    ES_NODES   = [node_info['name'] for node_info in NODES_INFO]
 
     response = requests.get(ELB_ENDPOINT + '/_cat/plugins?format=json', verify=False, auth=('elastic', PASSWORD))
     json_response = json.loads(response.text)
@@ -105,14 +134,15 @@ if __name__ == '__main__':
 
     cluster_name = args.cluster_name
 
-    ELB_ENDPOINT, KIBANA_ENDPOINT, ES_PASSWORD, ES_NODES, ES_PLUGINS = init(cluster_name)
+    ELB_ENDPOINT, KIBANA_ENDPOINT, ES_PASSWORD, ES_PLUGINS = init(cluster_name)
 
     logging.info("Starting Elasticsearch tests...")
 
     total_errors = 0
     total_errors += test_elasticsearch_endpoint(ELB_ENDPOINT, ES_PASSWORD)
     total_errors += test_elasticsearch_status_green(ELB_ENDPOINT, ES_PASSWORD)
-    total_errors += test_elasticsearch_plugins(ELB_ENDPOINT, ES_PASSWORD, ES_NODES, ES_PLUGINS)
+    total_errors += test_elasticsearch_num_of_nodes(ELB_ENDPOINT, ES_PASSWORD, cluster_name)
+    total_errors += test_elasticsearch_plugins(ELB_ENDPOINT, ES_PASSWORD, ES_PLUGINS)
     total_errors += test_kibana_endpoint(KIBANA_ENDPOINT)
 
     assert(total_errors == 0)
