@@ -33,7 +33,7 @@ spec:
         annotations:
           #! Must be a string
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
-          service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: #@ data.values.elb.elastic.extraSecurityGroupIds
+          service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: #@ data.values.elb.kibana.extraSecurityGroupIds
           #! external-dns.alpha.kubernetes.io/hostname: sym-search-dev-kibana.devi.symphony.com
       spec:
         type: LoadBalancer
