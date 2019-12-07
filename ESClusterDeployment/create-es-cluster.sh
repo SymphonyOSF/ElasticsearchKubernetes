@@ -19,39 +19,49 @@ catch() {
   fi
 }
 
-#Get desired cluster name
-read -r -p "${BOLD}Enter cluster name (Unique and MUST conform with dns naming conventions):${NORMAL} " CLUSTER_NAME
+# $1: Cluster name
+function create_cluster() {
+    CLUSTER_NAME=$1
+    #Verify there is no ES cluster with the same name
+    set +e
+    kubectl get Elasticsearch/${CLUSTER_NAME} >/dev/null 2>&1
+    if [[ $? == 0 ]]; then
+        echo "${BOLD}************* ERROR ************* ${NORMAL}"
+        echo "An Elastic cluster with the same name already exists"
+        echo "Use a different cluster name"
+        echo "${BOLD}************* ERROR ************* ${NORMAL}"
+        exit 0;
+    fi
+    set -e
 
-#Verify there is no ES cluster with the same name
-set +e
-kubectl get Elasticsearch/${CLUSTER_NAME} >/dev/null 2>&1
-if [[ $? == 0 ]]; then
-    echo "${BOLD}************* ERROR ************* ${NORMAL}"
-    echo "An Elastic cluster with the same name already exists"
-    echo "Use a different cluster name"
-    echo "${BOLD}************* ERROR ************* ${NORMAL}"
-    exit 0;
+    #Generate ES and Kibana resource file from the template.
+    #Finally, create (apply) the K8S resources
+    ytt --data-value "cluster_name=$CLUSTER_NAME" \
+        -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml \
+        -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/kibana.yml \
+        -f ./cluster_template.yml \
+        | kubectl apply -f -
+
+    #Apply generated resource file on K8S, this will create the Elastic+Kubernetes resources
+    echo "Waiting 10s to retrieve cluster information..."
+    sleep 10
+    echo "${BOLD}New cluster name:${NORMAL} ${CLUSTER_NAME}"
+    echo "${BOLD}Password for elastic user:${NORMAL} $(kubectl get secret "$CLUSTER_NAME-es-elastic-user" -o=jsonpath='{.data.elastic}' | base64 --decode)"
+
+
+    echo "Waiting 10s to retrieve DNS information..."
+    sleep 10
+    echo "${BOLD}Elastic ELB DNS:${NORMAL} $(kubectl get svc/"${CLUSTER_NAME}"-es-http -o json | jq .status.loadBalancer.ingress[0].hostname)"
+    echo "${BOLD}Kibana ELB DNS: ${NORMAL} $(kubectl get svc/kibana-"${CLUSTER_NAME}"-kb-http -o json | jq .status.loadBalancer.ingress[0].hostname)"
+    echo "${BOLD}You can start querying the services in 2-3 minutes ${NORMAL}"
+    echo "Finished cluster creation successfully."
+}
+
+if [[ $1 != "-y" || -z "$2" ]]; then
+    #Get desired cluster name
+    read -r -p "${BOLD}Enter cluster name (Unique and MUST conform with dns naming conventions):${NORMAL} " CLUSTER_NAME
+    create_cluster ${CLUSTER_NAME}
+else
+    CLUSTER_NAME=$2
+    create_cluster ${CLUSTER_NAME}
 fi
-set -e
-
-#Generate ES and Kibana resource file from the template.
-#Finally, create (apply) the K8S resources
-ytt --data-value "cluster_name=$CLUSTER_NAME" \
-    -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml \
-    -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/kibana.yml \
-    -f ./cluster_template.yml \
-    | kubectl apply -f -
-
-#Apply generated resource file on K8S, this will create the Elastic+Kubernetes resources
-echo "Waiting 10s to retrieve cluster information..."
-sleep 10
-echo "${BOLD}New cluster name:${NORMAL} ${CLUSTER_NAME}"
-echo "${BOLD}Password for elastic user:${NORMAL} $(kubectl get secret "$CLUSTER_NAME-es-elastic-user" -o=jsonpath='{.data.elastic}' | base64 --decode)"
-
-
-echo "Waiting 10s to retrieve DNS information..."
-sleep 10
-echo "${BOLD}Elastic ELB DNS:${NORMAL} $(kubectl get svc/"${CLUSTER_NAME}"-es-http -o json | jq .status.loadBalancer.ingress[0].hostname)"
-echo "${BOLD}Kibana ELB DNS: ${NORMAL} $(kubectl get svc/kibana-"${CLUSTER_NAME}"-kb-http -o json | jq .status.loadBalancer.ingress[0].hostname)"
-echo "${BOLD}You can start querying the services in 2-3 minutes ${NORMAL}"
-echo "Finished cluster creation successfully."
