@@ -15,5 +15,5 @@ pip install requests
 Make sure a cluster is up and running and the terminal session is connected to the EKS cluster.
 
 ```bash
-$ python test_elasticsearch.py -c ELASTICSEARCH_CLUSTER_NAME
+$ ./run_tests.sh ELASTICSEARCH_CLUSTER_NAME
 ```
