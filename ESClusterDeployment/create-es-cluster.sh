@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -e
+
+#Test kubectl connection
+kubectl auth can-i '*' '*' >/dev/null
+
 cd "${0%/*}"
 # Bold and normal font modifiers
 BOLD=$(tput bold)
@@ -18,25 +22,27 @@ catch() {
 #Get desired cluster name
 read -r -p "${BOLD}Enter cluster name (Unique and MUST conform with dns naming conventions):${NORMAL} " CLUSTER_NAME
 
-#Verify there is no local file with the same name locally
-if [[ -e "$CLUSTER_NAME.yml" ]]; then
+#Verify there is no ES cluster with the same name
+set +e
+kubectl get Elasticsearch/${CLUSTER_NAME} >/dev/null 2>&1
+if [[ $? == 0 ]]; then
     echo "${BOLD}************* ERROR ************* ${NORMAL}"
-    echo "A local file with the same name already exists"
-    echo "Use a different cluster name or re-create your old cluster by running:"
-    echo "$ kubectl apply -f ${CLUSTER_NAME}.yml"
+    echo "An Elastic cluster with the same name already exists"
+    echo "Use a different cluster name"
     echo "${BOLD}************* ERROR ************* ${NORMAL}"
     exit 0;
 fi
+set -e
 
 #Generate ES and Kibana resource file from the template.
+#Finally, create (apply) the K8S resources
 ytt --data-value "cluster_name=$CLUSTER_NAME" \
     -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml \
     -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/kibana.yml \
     -f ./cluster_template.yml \
-     >> "$CLUSTER_NAME.yml"
+    | kubectl apply -f -
 
 #Apply generated resource file on K8S, this will create the Elastic+Kubernetes resources
-kubectl apply -f "$CLUSTER_NAME.yml"
 echo "Waiting 10s to retrieve cluster information..."
 sleep 10
 echo "${BOLD}New cluster name:${NORMAL} ${CLUSTER_NAME}"
