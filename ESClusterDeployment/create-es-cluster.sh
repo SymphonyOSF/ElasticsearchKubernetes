@@ -18,6 +18,16 @@ catch() {
 #Get desired cluster name
 read -r -p "${BOLD}Enter cluster name (Unique and MUST conform with dns naming conventions):${NORMAL} " CLUSTER_NAME
 
+#Verify there is no local file with the same name locally
+if [[ -e "$CLUSTER_NAME.yml" ]]; then
+    echo "${BOLD}************* ERROR ************* ${NORMAL}"
+    echo "A local file with the same name already exists"
+    echo "Use a different cluster name or re-create your old cluster by running:"
+    echo "$ kubectl apply -f ${CLUSTER_NAME}.yml"
+    echo "${BOLD}************* ERROR ************* ${NORMAL}"
+    exit 0;
+fi
+
 #Generate ES and Kibana resource file from the template.
 ytt --data-value "cluster_name=$CLUSTER_NAME" \
     -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml \
