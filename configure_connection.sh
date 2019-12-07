@@ -29,6 +29,6 @@ read -r -p "Enter the cluster_auth_role_arn [Obtained from the terraform output]
 aws eks update-kubeconfig --name ${CLUSTER_NAME} --role-arn ${ROLE_ARN}
 
 #Verify that the authentication was successful
-kubectl auth can-i '*' '*'
+kubectl auth can-i '*' '*' >/dev/null
 
 echo "Successfully configured kubectl"
