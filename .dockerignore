@@ -9,9 +9,13 @@ Dockerfile*
 
 # .tfstate files
 **/*.tfstate*
- ./ESClusterDeployment/templates
+**/templates
+**/templates/**
 **/Certificate
 **/logs.sh
+**/Terraform
+**/test
 **/proxy-http.sh
 **/.key/**
 **/.pem/**
+*/README.md
