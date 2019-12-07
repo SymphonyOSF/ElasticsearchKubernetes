@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+cd "${0%/*}"
 PUSH_IMAGE=false
 if [[ $1 == "-push" ]]; then
   PUSH_IMAGE=true
