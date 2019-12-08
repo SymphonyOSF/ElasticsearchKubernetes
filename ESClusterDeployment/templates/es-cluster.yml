@@ -35,13 +35,12 @@ spec:
             sym-node-type: #@ str(data.values.cluster_name) +"-master-node"
         spec:
           affinity:
-            podAntiAffinity: #! Pod affinity guarantees a single pod per node
+            podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
-                - podAffinityTerm:
-                    labelSelector:
-                      matchLabels:
-                        elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
-                  topologyKey: kubernetes.io/hostname
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
           initContainers:
             - name: sysctl
               securityContext:
@@ -54,10 +53,10 @@ spec:
               imagePullPolicy: Always
               resources:
                 requests:
-                  memory: 3Gi
+                  memory: 2.85Gi
                   cpu: 1
                 limits:
-                  memory: 3.45Gi
+                  memory: 3.85Gi
                   cpu: 2
     #@ for data_group in data.values.node_configuration.data:
     - name: #@ "data-"+ str(data_group.zone_name)
@@ -87,39 +86,38 @@ spec:
             sym-node-type: #@ str(data.values.cluster_name) +"-data-node"
         spec:
           affinity:
-            podAntiAffinity: #! Pod affinity guarantees a single pod per node
+            podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
-                - podAffinityTerm:
-                    labelSelector:
-                      matchLabels:
-                        elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
-                  topologyKey: kubernetes.io/hostname
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      elasticsearch.k8s.elastic.co/cluster-name: #@ data.values.cluster_name
             nodeAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: failure-domain.beta.kubernetes.io/zone
-                        operator: In
-                        values:
-                          - #@ data_group.zone_name
+                - matchExpressions:
+                    - key: failure-domain.beta.kubernetes.io/zone
+                      operator: In
+                      values:
+                        - #@ data_group.zone_name
           initContainers:
             - name: sysctl
               securityContext:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           nodeSelector:
-            beta.kubernetes.io/instance-type: c5.xlarge
+            beta.kubernetes.io/instance-type: t3.large
           containers:
             - name: elasticsearch
               imagePullPolicy: Always
               #!specify resource limits and requests
               resources:
                 requests:
-                  memory: 6Gi
-                  cpu: 3
+                  memory: 6.45Gi
+                  cpu: 1
                 limits:
                   memory: 7.45Gi
-                  cpu: 4
+                  cpu: 2
     #@ end
   http:
     service:
