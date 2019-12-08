@@ -2,14 +2,14 @@ module "eks_cluster" {
   source = "git::https://github.com/SymphonyOSF/ElasticsearchKubernetes.git//Terraform/cluster"
 
   environment_tag             = "dev"
-  region                      = ""
+  region                      = var.region
   cluster_name                = ""
   public_key                  = ""
   num_availability_zones      = 2
 
   //Data nodes group
   num_data_node_groups        = 2
-  data_node_instante_type     = "c5.xlarge"
+  data_node_instante_type     = "t3.large"
   min_num_data_nodes          = 1
   max_num_data_nodes          = 60
   desired_num_data_nodes      = 1
@@ -40,10 +40,15 @@ terraform {
 # https://www.terraform.io/docs/providers/aws/index.html
 provider "aws" {
   version = ">= 2.38.0"
+  region = var.region
 }
 
 output "eks_cluster_output" {
   value = module.eks_cluster
+}
+
+variable "region" {
+  description = "AWS region to deploy the cluster in"
 }
 
 output "REMINDER" {
