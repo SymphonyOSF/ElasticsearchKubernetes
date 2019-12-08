@@ -1,6 +1,6 @@
 variable "cluster_name" {}
 
-variable "subnet_list" {}
+variable "subnet_id_list" {}
 
 variable "environment_tag" {}
 

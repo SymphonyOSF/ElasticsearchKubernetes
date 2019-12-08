@@ -1,6 +1,6 @@
 variable "worker_asg_name" {}
 
-variable "subnet_ids" {}
+variable "subnet_id_list" {}
 
 variable "cluster_name" {}
 
