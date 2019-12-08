@@ -10,10 +10,10 @@ node_configuration:
     count: 1
   data:
     - zone_name: us-east-1a #! Make sure there is an EKS node group in this zone
-      count: 2
+      count: 1
       storage_size: 7G #! Must specify unit: 75G or 65 Gi
     - zone_name: us-east-1b #! Make sure there is an EKS node group in this zone
-      count: 2
+      count: 1
       storage_size: 7G #! Must specify unit: 75G or 65 Gi
 elb:
   elastic:
