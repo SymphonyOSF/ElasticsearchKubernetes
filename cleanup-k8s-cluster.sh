@@ -2,31 +2,28 @@
 
 function delete_cluster() {
     echo "Starting clean up..."
-#    CD into the folder containing this script
-    cd "${0%/*}"
-    cd ./Kubernetes
+
+#Get directory in which the script is located
+    SCRIPT_DIR="${0%/*}"
 
 #    Delete all elasticsearch operator resources
     kubectl get namespaces --no-headers -o custom-columns=:metadata.name | xargs -n1 kubectl delete elastic --all -n
-    kubectl delete -f ./all-in-one.yaml
+    kubectl delete -f ${SCRIPT_DIR}/Kubernetes/all-in-one.yaml
     kubectl delete validatingwebhookconfigurations validating-webhook-configuration
 
 #    Delete Kubernetes Dashboard
-    kubectl delete -f ./Dashboard/cluster_binding.yaml
-    kubectl delete -f ./Dashboard/user.yaml
+    kubectl delete -f ${SCRIPT_DIR}/Kubernetes/Dashboard/cluster_binding.yaml
+    kubectl delete -f ${SCRIPT_DIR}/Kubernetes/Dashboard/user.yaml
     kubectl delete -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
 
 #    Delete autoscaler
-    kubectl delete -f ./cluster-autoscaler-autodiscover.yaml
-
-#    Delete k8s config_map
-    kubectl delete -f ./config_map_aws_auth.yml
+    kubectl delete -f ${SCRIPT_DIR}/Kubernetes/cluster-autoscaler-autodiscover.yaml
 
 #    Delete all Persistent Volumes
     kubectl delete  --all pv
 
     #Bring down DNS mapping service
-    kubectl delete -f ./DNS/external_dns.yaml
+#    kubectl delete -f ${SCRIPT_DIR}/Kubernetes/DNS/external_dns.yaml
 }
 
 if [[ $1 != "-y" ]]; then
