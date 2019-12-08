@@ -2,13 +2,15 @@ module "eks_network_module" {
   source                  = "../modules/eks_network"
   cluster_name            = var.cluster_name
   environment_tag         = var.environment_tag
-  num_availability_zones  = var.num_availability_zones
+  num_subnets             = var.num_subnets
+  existing_vpc_id         = var.network.vpc_id
+  subnet_id_list          = var.network.subnet_id_list
 }
 
 module "eks_cluster" {
   source                  = "../modules/eks_cluster"
   cluster_name            = var.cluster_name
-  subnet_list             = module.eks_network_module.subnet_list
+  subnet_id_list          = module.eks_network_module.subnet_id_list
   environment_tag         = var.environment_tag
   vpc_id                  = module.eks_network_module.vpc_id
 }
@@ -28,7 +30,7 @@ resource "aws_key_pair" "eks_nodes_key" {
 module "data_node_workers" {
   source                                      = "../modules/eks_node_group"
   worker_asg_name                             = "data_node_workers"
-  subnet_ids                                  = module.eks_network_module.subnet_list.*.id
+  subnet_id_list                              = module.eks_network_module.subnet_id_list
   cluster_name                                = module.eks_cluster.eks_cluster_name
   desired_capacity                            = var.desired_num_data_nodes
   instance_type                               = var.data_node_instante_type
@@ -47,7 +49,7 @@ module "data_node_workers" {
 module "master_node_workers" {
   source                                      = "../modules/eks_node_group"
   worker_asg_name                             = "master_node_workers"
-  subnet_ids                                  = module.eks_network_module.subnet_list.*.id
+  subnet_id_list                              = module.eks_network_module.subnet_id_list
   cluster_name                                = module.eks_cluster.eks_cluster_name
   desired_capacity                            = var.desired_num_master_nodes
   instance_type                               = var.master_node_instante_type
@@ -65,7 +67,7 @@ module "master_node_workers" {
 module "service_node_workers" {
   source                                      = "../modules/eks_node_group"
   worker_asg_name                             = "service_node_workers"
-  subnet_ids                                  = module.eks_network_module.subnet_list.*.id
+  subnet_id_list                              = module.eks_network_module.subnet_id_list
   cluster_name                                = module.eks_cluster.eks_cluster_name
   desired_capacity                            = var.desired_num_service_nodes
   instance_type                               = var.service_node_instante_type
@@ -81,7 +83,7 @@ module "service_node_workers" {
 }
 
 resource "aws_security_group" "node_ssh" {
-  name        = "office_ssh_sg"
+  name        = "${var.cluster_name}_office_ssh_sg"
   description = "Security group for allowing ssh from the office"
   vpc_id      = module.eks_network_module.vpc_id
 
