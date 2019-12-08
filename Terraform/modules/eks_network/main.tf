@@ -17,11 +17,12 @@ resource "aws_vpc" "sym_search_vpc" {
   }
 }
 
-//Creates var.num_availability_zones subnets
+//Creates N subnets
 //used for spawning the cluster accross multiple AZs
 resource "aws_subnet" "sym_search_subnet" {
   count = local.subnect_count
 
+//  Will generate an error if trying to create more subnets than available AZs in the region
   availability_zone = data.aws_availability_zones.available.names[count.index]
 //  Each subnet gets a total of 4094 IP addresses (K8S is ip intensive, better to have more than enough)
   cidr_block        = "10.0.${count.index * 16}.0/20"
