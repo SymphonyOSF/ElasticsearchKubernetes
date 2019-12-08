@@ -18,8 +18,8 @@ variable "public_key" {
   type        = string
 }
 
-variable "num_availability_zones" {
-  description = "Number of availability zones to be created inside the VPC"
+variable "num_subnets" {
+  description = "Number of subnets be created inside the VPC, each on a single AZ"
   type        = number
 }
 
@@ -97,4 +97,16 @@ variable "ssh_sg_id_list" {
   description = "In addition to enabling/disabling SSH from the office, you can add extra SG ids that will have access to the 22 port on all the nodes."
   default     = [""]
   type        = list(string)
+}
+
+variable "network" {
+  description = "Define both to deploy the EKS Cluster + Worker nodes on top of that VPC+subnets. Don't define to create a new VPC+subnets. See important info: https://perzoinc.atlassian.net/wiki/spaces/SEARCH/pages/646057959/Using+existing+VPC+and+subnets"
+  type        = object({
+    vpc_id    = string
+    subnet_id_list = list(string)
+  })
+  default     = {
+    vpc_id: null
+    subnet_id_list: null
+  }
 }
