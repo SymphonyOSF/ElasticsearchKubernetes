@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 set -e
-
-#Get terraform output in current directory
-#TT;
-#terraform output -json eks_cluster_output | jq -r .config_map_aws_auth >> ${TT}
-SERVICE_INSTANCE_TYPE=$(terraform output -json eks_cluster_output | jq -r .service_instance_type)
-CLUSTER_NAME=$(terraform output -json eks_cluster_output | jq -r .cluster_name)
-
-#CD into the directory containing this script
-SCRIPT_DIR="${0%/*}"
-
 # Bold and normal font modifiers
 bold=$(tput bold)
 normal=$(tput sgr0)
@@ -25,8 +15,12 @@ catch() {
   fi
 }
 
-#Get cluster_name and service_instance_type from terraform output.
-#cd ${SCRIPT_DIR}/Kubernetes
+#Get cluster_name and instance type of the service node group
+SERVICE_INSTANCE_TYPE=$(terraform output -json eks_cluster_output | jq -r .service_instance_type)
+CLUSTER_NAME=$(terraform output -json eks_cluster_output | jq -r .cluster_name)
+
+#Get the directory where the script is located
+SCRIPT_DIR="${0%/*}"
 
 #Change kubectl authentication conf to match the K8S master
 aws eks update-kubeconfig --name "${CLUSTER_NAME}"
