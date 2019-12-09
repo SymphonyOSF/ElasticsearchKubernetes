@@ -6,15 +6,23 @@ image: luisplazas/elastic:7.4.2
 version: 7.4.2
 node_configuration:
   master:
-    storage_size: 3.5G #! Must specify unit: 75G or 65 Gi
+    storage_size: 7G #! Must specify unit e.g. 75G or 65 Gi
     count: 1
+    node_instance_type: c5.large
+    resources_per_node:
+      cpu: 2
+      memory: 4 #! Amount in GiB
   data:
-    - zone_name: us-east-1a #! Make sure there is an EKS node group in this zone
-      count: 1
-      storage_size: 7G #! Must specify unit: 75G or 65 Gi
-    - zone_name: us-east-1b #! Make sure there is an EKS node group in this zone
-      count: 1
-      storage_size: 7G #! Must specify unit: 75G or 65 Gi
+    storage_size: 7G #! Must specify unit e.g. 75G or 65 Gi
+    node_instance_type: t3.large
+    resources_per_node:
+      cpu: 2
+      memory: 8 #! Amount in GiB
+    availability_zones:
+      - zone_name: us-east-1a #! Make sure there is an EKS node group in this zone
+        count: 1
+      - zone_name: us-east-1b #! Make sure there is an EKS node group in this zone
+        count: 1
 elb:
   elastic:
     tls:
