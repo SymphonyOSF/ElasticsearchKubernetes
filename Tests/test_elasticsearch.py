@@ -16,7 +16,7 @@ def init(cluster_name):
     logging.info("The cluster name is: " + cluster_name)
 
     # Record Elasticsearch and Kibana Endpoint
-    ELB_ENDPOINT    = 'https://' + os.popen('kubectl get svc/' + cluster_name + '-es-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':9200'
+    ELB_ENDPOINT    = 'ttps://' + os.popen('kubectl get svc/' + cluster_name + '-es-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':9200'
     KIBANA_ENDPOINT = 'https://' + os.popen('kubectl get svc/kibana-' + cluster_name + '-kb-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':5601'
 
     # Record Elasticsearch HTTP Credential
@@ -32,14 +32,19 @@ def init(cluster_name):
 def test_elasticsearch_endpoint(ELB_ENDPOINT, PASSWORD):
     logging.info('Testing if Elasticsearch Endpoint response status is 200...')
 
-    response = requests.get(ELB_ENDPOINT, verify=False, auth=('elastic', PASSWORD))
-
-    if response.status_code != 200:
-        logging.error('Could not get HTTP response 200 from ' + ELB_ENDPOINT)
-        return 1
-    else:
-        logging.info('Elasticsearch is up and running')
+    try:
+        response = requests.get(ELB_ENDPOINT, verify=False, auth=('elastic', PASSWORD))
+        if response.status_code != 200:
+            logging.error('Could not get HTTP response 200 from ' + ELB_ENDPOINT)
+            return 1
+        else:
+            logging.info('Elasticsearch is up and running')
         return 0
+
+    except requests.exceptions.RequestException as e:
+        print(e)
+        return 1
+
 
 
 # Test if Elasticsearch cluster status is green
