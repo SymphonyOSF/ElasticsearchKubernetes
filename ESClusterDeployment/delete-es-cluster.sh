@@ -29,7 +29,7 @@ function delete_cluster() {
         echo "This is the list of existing Elastic clusters:"
         kubectl get Elasticsearch -o=custom-columns=CLUSTER_NAME:.metadata.name
         echo "${BOLD}************* ERROR ************* ${NORMAL}"
-        exit 0;
+        exit 1;
     fi
     set -e
 
