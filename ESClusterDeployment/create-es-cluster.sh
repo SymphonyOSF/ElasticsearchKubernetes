@@ -20,6 +20,7 @@ catch() {
 }
 
 # $1: Cluster name
+# $2: (Optional) contains environment name: dev
 function create_cluster() {
     CLUSTER_NAME=$1
     #Verify there is no ES cluster with the same name
@@ -30,15 +31,27 @@ function create_cluster() {
         echo "An Elastic cluster with the same name already exists"
         echo "Use a different cluster name"
         echo "${BOLD}************* ERROR ************* ${NORMAL}"
-        exit 0;
+        exit 1;
     fi
     set -e
+
+#    Initialize template files
+    ELASTIC_TEMPLATE=https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml
+    KIBANA_TEMPLATE=https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/kibana.yml
+    if [[ -f "./templates/es-cluster.yml" ]]; then
+        echo "Using local ES template file (development mode)"
+        ELASTIC_TEMPLATE=./templates/es-cluster.yml
+    fi
+    if [[ -f "./templates/kibana.yml" ]]; then
+        echo "Using local Kibana template file (development mode)"
+        KIBANA_TEMPLATE=./templates/kibana.yml
+    fi
 
     #Generate ES and Kibana resource file from the template.
     #Finally, create (apply) the K8S resources
     ytt --data-value "cluster_name=$CLUSTER_NAME" \
-        -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml \
-        -f https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/kibana.yml \
+        -f ${ELASTIC_TEMPLATE} \
+        -f ${KIBANA_TEMPLATE} \
         -f ./cluster_template.yml \
         | kubectl apply -f -
 
@@ -60,7 +73,7 @@ function create_cluster() {
 if [[ $1 != "-y" || -z "$2" ]]; then
     #Get desired cluster name
     read -r -p "${BOLD}Enter cluster name (Unique and MUST conform with dns naming conventions):${NORMAL} " CLUSTER_NAME
-    create_cluster ${CLUSTER_NAME}
+    create_cluster ${CLUSTER_NAME} "dev"
 else
     CLUSTER_NAME=$2
     create_cluster ${CLUSTER_NAME}
