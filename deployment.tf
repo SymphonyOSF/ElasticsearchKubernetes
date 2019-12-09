@@ -5,7 +5,7 @@ module "eks_cluster" {
   region                      = var.region
   cluster_name                = ""
   public_key                  = ""
-  num_availability_zones      = 2
+  num_subnets                 = 2
 
   //Data nodes group
   num_data_node_groups        = 2
