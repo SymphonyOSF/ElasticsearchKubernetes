@@ -47,20 +47,20 @@ spec:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           nodeSelector:
-            beta.kubernetes.io/instance-type: c5.large
+            beta.kubernetes.io/instance-type: #@ data.values.node_configuration.master.node_instance_type
           containers:
             - name: elasticsearch
               imagePullPolicy: Always
               resources:
                 requests:
-                  memory: 2.85Gi
-                  cpu: 1
+                  memory: #@ str(data.values.node_configuration.master.resources_per_node.memory-1) + "Gi"
+                  cpu: #@ str(data.values.node_configuration.master.resources_per_node.cpu-1)
                 limits:
-                  memory: 3.85Gi
-                  cpu: 2
-    #@ for data_group in data.values.node_configuration.data:
-    - name: #@ "data-"+ str(data_group.zone_name)
-      count: #@ int(int(data_group.count))
+                  memory: #@ str(data.values.node_configuration.master.resources_per_node.memory) + "Gi"
+                  cpu: #@ str(data.values.node_configuration.master.resources_per_node.cpu)
+    #@ for availability_zone in data.values.node_configuration.data.availability_zones:
+    - name: #@ "data-"+ str(availability_zone.zone_name)
+      count: #@ int(int(availability_zone.count))
       volumeClaimTemplates:
         - metadata:
             #! Name must always be elasticsearch-data
@@ -70,7 +70,7 @@ spec:
               - ReadWriteOnce
             resources:
               requests:
-                storage: #@ data_group.storage_size
+                storage: #@ data.values.node_configuration.data.storage_size
             storageClassName: gp2
       config:
         node.master: false
@@ -78,7 +78,7 @@ spec:
         node.ingest: false
         node.ml: false
         bootstrap.memory_lock: false
-        node.attr.zone: #@ data_group.zone_name
+        node.attr.zone: #@ availability_zone.zone_name
         cluster.routing.allocation.awareness.attributes: zone
       podTemplate:
         metadata:
@@ -99,25 +99,25 @@ spec:
                     - key: failure-domain.beta.kubernetes.io/zone
                       operator: In
                       values:
-                        - #@ data_group.zone_name
+                        - #@ availability_zone.zone_name
           initContainers:
             - name: sysctl
               securityContext:
                 privileged: true
               command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
           nodeSelector:
-            beta.kubernetes.io/instance-type: t3.large
+            beta.kubernetes.io/instance-type: #@ data.values.node_configuration.data.node_instance_type
           containers:
             - name: elasticsearch
               imagePullPolicy: Always
               #!specify resource limits and requests
               resources:
                 requests:
-                  memory: 6.45Gi
-                  cpu: 1
+                  memory: #@ str(data.values.node_configuration.data.resources_per_node.memory-1) + "Gi"
+                  cpu: #@ str(data.values.node_configuration.data.resources_per_node.cpu-1)
                 limits:
-                  memory: 7.45Gi
-                  cpu: 2
+                  memory: #@ str(data.values.node_configuration.data.resources_per_node.memory) + "Gi"
+                  cpu: #@ str(data.values.node_configuration.data.resources_per_node.cpu)
     #@ end
   http:
     service:
