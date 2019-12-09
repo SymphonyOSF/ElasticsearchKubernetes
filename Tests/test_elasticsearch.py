@@ -16,8 +16,8 @@ def init(cluster_name):
     logging.info("The cluster name is: " + cluster_name)
 
     # Record Elasticsearch and Kibana Endpoint
-    ELB_ENDPOINT    = 'https://' + os.popen('kubectl get svc -o json | jq \'.items[] | select(.metadata.name == "' + cluster_name + '-es-http") | .status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':9200'
-    KIBANA_ENDPOINT = 'https://' + os.popen('kubectl get svc -o json | jq \'.items[] | select(.metadata.name == "kibana-' + cluster_name + '-kb-http") | .status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':5601'
+    ELB_ENDPOINT    = 'https://' + os.popen('kubectl get svc/' + cluster_name + '-es-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':9200'
+    KIBANA_ENDPOINT = 'https://' + os.popen('kubectl get svc/kibana-' + cluster_name + '-kb-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':5601'
 
     # Record Elasticsearch HTTP Credential
     ES_PASSWORD     = os.popen('kubectl get secret \'' + cluster_name + '-es-elastic-user\'  -o=jsonpath=\'{.data.elastic}\' | base64 --decode').read()
@@ -61,18 +61,8 @@ def test_elasticsearch_status_green(ELB_ENDPOINT, PASSWORD):
 def test_elasticsearch_num_of_nodes(ES_NODES, PASSWORD, CLUSTER_NAME):
     logging.info('Testing if the correct number of elasticsearch nodes are up...')
 
-    # Read CLUSTER-NAME.yml file for the true node count
-    node_count_should_be = 0
-    with open(os.getcwd() + '/../ES-Cluster/' + CLUSTER_NAME + '.yml', 'r') as elastic_yml_stream:
-        docs = yaml.load_all(elastic_yml_stream, Loader=yaml.FullLoader)
-        for doc in docs:
-            # Count only ES nodes
-            if doc['kind'] != 'Elasticsearch':
-                continue
-
-            for nodeSet in doc['spec']['nodeSets']:
-                node_count_should_be += nodeSet['count']
-
+    # Parse 'elasticsearch' resource for the true node count
+    node_count_should_be = int(os.popen('kubectl get elasticsearch -o json | jq \'.items[0].spec.nodeSets[] | .count\' | jq -s \'add\' ').read().rstrip())
 
     response = requests.get(ELB_ENDPOINT + '/_nodes', verify=False, auth=('elastic', PASSWORD))
     node_count_is = json.loads(response.text)['_nodes']['total']
@@ -138,11 +128,17 @@ if __name__ == '__main__':
 
     logging.info("Starting Elasticsearch tests...")
 
+    # Test if ELB is up before running other tests
+    if test_elasticsearch_endpoint(ELB_ENDPOINT, ES_PASSWORD) == 1:
+        raise Exception('ELB Endpoint not up, ending tests...')
+
     total_errors = 0
-    total_errors += test_elasticsearch_endpoint(ELB_ENDPOINT, ES_PASSWORD)
     total_errors += test_elasticsearch_status_green(ELB_ENDPOINT, ES_PASSWORD)
     total_errors += test_elasticsearch_num_of_nodes(ELB_ENDPOINT, ES_PASSWORD, cluster_name)
     total_errors += test_elasticsearch_plugins(ELB_ENDPOINT, ES_PASSWORD, ES_PLUGINS)
     total_errors += test_kibana_endpoint(KIBANA_ENDPOINT)
 
-    assert(total_errors == 0)
+    if total_errors > 0:
+        raise Exception('One or more tests failed. Total errors: ' + total_errors)
+    else:
+        logging.info('All tests passed. This ES Cluster should be good to go!')
