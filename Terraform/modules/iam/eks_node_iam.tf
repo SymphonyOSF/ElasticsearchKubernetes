@@ -18,6 +18,21 @@ resource "aws_iam_role" "worker" {
 POLICY
 }
 
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerNodePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.worker.name
+}
+
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKS_CNI_Policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.worker.name
+}
+
+resource "aws_iam_role_policy_attachment" "worker_node_AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.worker.name
+}
+
 resource "aws_iam_policy" "worker_auto_scale_policy" {
   name        = "${var.eks_cluster_name}_worker_auto_scale_policy"
   policy = <<EOF
@@ -102,21 +117,6 @@ resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerDnsPolicy"
 
 resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerAutoScalePolicy" {
   policy_arn = aws_iam_policy.worker_auto_scale_policy.arn
-  role       = aws_iam_role.worker.name
-}
-
-resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerNodePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.worker.name
-}
-
-resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKS_CNI_Policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.worker.name
-}
-
-resource "aws_iam_role_policy_attachment" "worker_node_AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.worker.name
 }
 

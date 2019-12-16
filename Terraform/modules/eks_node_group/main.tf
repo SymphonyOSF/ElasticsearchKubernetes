@@ -1,7 +1,7 @@
 resource "aws_eks_node_group" "node_group" {
   count = var.node_group_count
   cluster_name    = var.cluster_name
-  node_group_name = "${var.worker_asg_name}${count.index}"
+  node_group_name = "${var.worker_asg_name}-${count.index}"
   node_role_arn   = var.node_role_iam_arn
   subnet_ids      = var.single_az == true ? [var.subnet_id_list[count.index % length(var.subnet_id_list)]] : var.subnet_id_list
   disk_size       = 10
@@ -9,8 +9,8 @@ resource "aws_eks_node_group" "node_group" {
 
 
   dynamic "remote_access" {
-    // Little hack, if there are security_groups defined on the list, will create this block once.
-    // If there is no security_groups defined, will not create this block at all.
+    // If there are security_groups defined on the list, will create this block once.
+    // If there is no security_groups defined, will not create the "remote_access" block.
     for_each = var.enable_ssh_access == true && length(var.ssh_sg_id_list) >= 1  ? [1] : []
     content {
       ec2_ssh_key               = var.ssh_keyname
