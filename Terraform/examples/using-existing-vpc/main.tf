@@ -8,7 +8,7 @@ module "eks_cluster" {
   num_subnets                 = 2
 
   //Data nodes group
-  num_data_node_groups        = 2
+  num_data_node_groups        = 1
   data_node_instante_type     = "t3.large"
   min_num_data_nodes          = 1
   max_num_data_nodes          = 60
@@ -29,8 +29,8 @@ module "eks_cluster" {
   enable_ssh_access           = true
 
   network = {
-    vpc_id          = var.vpc_id
-    subnet_id_list  = var.subnet_id_list
+    vpc_id          = "vpc-a2ed6dc7"
+    subnet_id_list  = ["subnet-fb30a39e", "subnet-9b20c0b0", "subnet-d32187a4"]
   }
 }
 
@@ -53,15 +53,8 @@ output "eks_cluster_output" {
 }
 
 variable "region" {
+  default = "us-east-1"
   description = "AWS region to deploy the cluster in"
-}
-
-variable "vpc_id" {
-  default = "vpc-0b9a092701e6fba2f"
-}
-
-variable "subnet_id_list" {
-  default = ["subnet-09b866c484fbc9245", "subnet-0ee2bddf7993c3055"]
 }
 
 output "REMINDER" {
