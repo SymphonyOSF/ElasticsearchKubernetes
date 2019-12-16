@@ -27,6 +27,12 @@ module "eks_cluster" {
   desired_num_service_nodes   = 1
 
   enable_ssh_access           = true
+
+//  Dev default VPC and subnets
+  network = {
+    vpc_id          = "vpc-a2ed6dc7"
+    subnet_id_list  = ["subnet-fb30a39e", "subnet-9b20c0b0", "subnet-d32187a4"]
+  }
 }
 
 ###########!! DO NOT REMOVE THIS !!############
