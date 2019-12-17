@@ -3,7 +3,7 @@ module "eks_cluster" {
 
   environment_tag             = "dev"
   region                      = var.region
-  cluster_name                = "sym-search-dev-existing-vpc-test"
+  cluster_name                = var.cluster_name
   public_key                  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXx55LPxZMkO+KNYovPrF6ghA5apRWqS+F5Uutz1Vq5EpbgJiclZN1QvExxAdGoyue0mT3EGrWcww4X1RuAUFc7yQFYaBgfVpUm4P5HBnO695WMDYYum1Dy+Tkfn/NoK9+XxY6nMSxT1R/tODcyId+boaFeAHNH//8FyE57P6JSQq/UpWWCKcV0+Gjo4uio8WeSS0hwGbchzxbB+7XQw0JmWFFPqq8DRxZUb7sesAIUknUIf7lDzQ+juagIpQ9SO7lr35G2VQLPJm8dB7djwx9vsFzw0CoMZZgQH/k2LHYJzz0gtzWCVT2lQ1RFsaKGnaCuPNIHnOm2q0MRLhILH2F"
   num_subnets                 = 2
 
@@ -29,8 +29,8 @@ module "eks_cluster" {
   enable_ssh_access           = true
 
   network = {
-    vpc_id          = var.vpc_id
-    subnet_id_list  = var.subnet_id_list
+    vpc_id          = "vpc-a2ed6dc7"
+    subnet_id_list  = ["subnet-fb30a39e", "subnet-9b20c0b0", "subnet-d32187a4"]
   }
 }
 
@@ -56,12 +56,8 @@ variable "region" {
   description = "AWS region to deploy the cluster in"
 }
 
-variable "vpc_id" {
-  default = "vpc-0b9a092701e6fba2f"
-}
-
-variable "subnet_id_list" {
-  default = ["subnet-09b866c484fbc9245", "subnet-0ee2bddf7993c3055"]
+variable "cluster_name" {
+  default = "sym-search-dev-existing-vpc-test"
 }
 
 output "REMINDER" {

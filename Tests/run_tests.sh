@@ -5,4 +5,5 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+python test_eks.py
 python test_elasticsearch.py -c $1
