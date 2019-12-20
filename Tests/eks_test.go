@@ -1,6 +1,7 @@
 package test
 
 import (
+	"os"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -25,6 +26,12 @@ func TestEKSCluster(t *testing.T) {
 	// The folder where we have our Terraform code
 	workingDir := "../Terraform/examples/using-existing-vpc/"
 
+	// Get the cluster number from environment variables
+	clusterName := os.Getenv("EKS_CLUSTER_NAME")
+
+	// Set the aws region in which the EKS cluster is deployed
+	awsRegion := "us-east-1"
+
 	// At the end of the test, undeploy the terraform infrastructure
 	defer test_structure.RunTestStage(t, "cleanup_terraform", func() {
 		undeployUsingTerraform(t, workingDir)
@@ -40,15 +47,13 @@ func TestEKSCluster(t *testing.T) {
 
 	// Deploy the EKS Cluster on AWS using Terraform
 	test_structure.RunTestStage(t, "deploy_terraform", func() {
-		awsRegion := "us-east-1"
-		test_structure.SaveString(t, workingDir, "awsRegion", awsRegion)
-		deployUsingTerraform(t, awsRegion, workingDir)
+		deployUsingTerraform(t, workingDir, clusterName, awsRegion)
 	})
 
 	// Bootstrap the Kubernetes Cluster
 	test_structure.RunTestStage(t, "bootstrap_k8s_cluster", func() {
 		// Update the current context to the newly created EKS Cluster with user details
-		updateKubernetesContext(t, workingDir, "sym-search-elasticsearch-test")
+		updateKubernetesContext(t, workingDir, clusterName, awsRegion)
 
 		// Bootstrap EKS cluster with appropriate k8s resources
 		bootstrapKubernetesCluster(t, workingDir)
@@ -61,13 +66,13 @@ func TestEKSCluster(t *testing.T) {
 }
 
 
-func deployUsingTerraform(t *testing.T, awsRegion string, workingDir string) {
+func deployUsingTerraform(t *testing.T, workingDir string, clusterName string, awsRegion string) {
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
 		TerraformDir: workingDir,
 
 		BackendConfig: map[string]interface{}{
-		"bucket": "sym-search-elasticsearch-test",
+		"bucket": clusterName,
 		"key"   : "directory.tfstate",
 		"region": awsRegion,
 		},
@@ -75,7 +80,7 @@ func deployUsingTerraform(t *testing.T, awsRegion string, workingDir string) {
 		// Variables to pass to our Terraform code using -var options
 		Vars: map[string]interface{}{
 			"region"      : awsRegion,
-			"cluster_name": "sym-search-elasticsearch-test",
+			"cluster_name": clusterName,
 		},
 
 	}
@@ -85,8 +90,6 @@ func deployUsingTerraform(t *testing.T, awsRegion string, workingDir string) {
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
-
-
 }
 
 
@@ -100,9 +103,9 @@ func undeployUsingTerraform(t *testing.T, workingDir string) {
 
 
 // This updates the current K8s context to point to the newly created EKS Cluster with given user credentials
-func updateKubernetesContext(t *testing.T, workingDir string, clusterName string) {
+func updateKubernetesContext(t *testing.T, workingDir string, clusterName string, awsRegion string) {
 	sess, serr := session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1"),
+		Region: aws.String(awsRegion),
 	})
 
 	if serr != nil {
