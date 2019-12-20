@@ -83,6 +83,7 @@ module "service_node_workers" {
 }
 
 resource "aws_security_group" "node_ssh" {
+  count       = var.enable_ssh_access == true ? 1 : 0
   name        = "${var.cluster_name}_office_ssh_sg"
   description = "Security group for allowing ssh from the office"
   vpc_id      = module.eks_network_module.vpc_id

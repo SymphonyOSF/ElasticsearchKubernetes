@@ -8,7 +8,7 @@ module "eks_cluster" {
   num_subnets                 = 2
 
   //Data nodes group
-  num_data_node_groups        = 2
+  num_data_node_groups        = 1
   data_node_instante_type     = "t3.large"
   min_num_data_nodes          = 1
   max_num_data_nodes          = 60
@@ -53,6 +53,7 @@ output "eks_cluster_output" {
 }
 
 variable "region" {
+  default = "us-east-1"
   description = "AWS region to deploy the cluster in"
 }
 
