@@ -34,3 +34,7 @@ output "cluster_name" {
 output "cluster_auth_role_arn" {
   value = module.iam.access_role_arn
 }
+
+output "eks_cluster_arn" {
+  value = module.eks_cluster.eks_cluster_arn
+}

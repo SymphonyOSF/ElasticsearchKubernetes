@@ -2,17 +2,13 @@ package test
 
 import (
 	"os"
+	"os/exec"
 	"io/ioutil"
 	"strings"
 	"testing"
 
-	"k8s.io/client-go/tools/clientcmd"
 	"github.com/stretchr/testify/require"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/eks"
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -53,7 +49,7 @@ func TestEKSCluster(t *testing.T) {
 	// Bootstrap the Kubernetes Cluster
 	test_structure.RunTestStage(t, "bootstrap_k8s_cluster", func() {
 		// Update the current context to the newly created EKS Cluster with user details
-		updateKubernetesContext(t, workingDir, clusterName, awsRegion)
+		updateKubernetesContext(t, clusterName)
 
 		// Bootstrap EKS cluster with appropriate k8s resources
 		bootstrapKubernetesCluster(t, workingDir)
@@ -61,7 +57,7 @@ func TestEKSCluster(t *testing.T) {
 
 	// Create an Elasticsearch Cluster
 	test_structure.RunTestStage(t, "create_elastic_cluster", func() {
-		//createElasticsearchCluster(t)
+		createElasticsearchCluster(t)
 	})
 }
 
@@ -103,60 +99,12 @@ func undeployUsingTerraform(t *testing.T, workingDir string) {
 
 
 // This updates the current K8s context to point to the newly created EKS Cluster with given user credentials
-func updateKubernetesContext(t *testing.T, workingDir string, clusterName string, awsRegion string) {
-	sess, serr := session.NewSession(&aws.Config{
-		Region: aws.String(awsRegion),
-	})
-
-	if serr != nil {
-		logger.Log(t, serr.Error())
-	}
-
-	svc := eks.New(sess)
-
-	output, err := svc.DescribeCluster(&eks.DescribeClusterInput{
-		Name: aws.String(clusterName),
-	})
-
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case eks.ErrCodeResourceNotFoundException:
-				logger.Log(t, eks.ErrCodeResourceNotFoundException, aerr.Error())
-			case eks.ErrCodeClientException:
-				logger.Log(t, eks.ErrCodeClientException, aerr.Error())
-			case eks.ErrCodeServerException:
-				logger.Log(t, eks.ErrCodeServerException, aerr.Error())
-			case eks.ErrCodeServiceUnavailableException:
-				logger.Log(t, eks.ErrCodeServiceUnavailableException, aerr.Error())
-			default:
-				logger.Log(t, aerr.Error())
-			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			logger.Log(t, err.Error())
-		}
-		return
-	}
-
-	// Get Kubeconfig file location
-	configPath, err := k8s.GetKubeConfigPathE(t)
+func updateKubernetesContext(t *testing.T, clusterName string) {
+	cmd := exec.Command("aws", "eks", "update-kubeconfig", "--name", clusterName)
+	_, err := cmd.CombinedOutput()
 	require.NoError(t, err)
-
-	// Load kubeconfig from file
-	clientConfig := k8s.LoadConfigFromPath(configPath)
-
-	rawConfig, err := clientConfig.RawConfig()
-	require.NoError(t, err)
-
-	// Update the kubeconfig with new context
-	k8s.UpsertConfigContext(&rawConfig, *output.Cluster.Arn, *output.Cluster.Arn, *output.Cluster.Arn)
-	clientcmd.ModifyConfig(clientConfig.ConfigAccess(), rawConfig, false)
-
-	// Save the cluster_arn for later
-	test_structure.SaveString(t, workingDir, "cluster_arn", *output.Cluster.Arn)
 }
+
 
 // Bootstrap EKS cluster with the required K8s resources
 func bootstrapKubernetesCluster(t *testing.T, workingDir string) {
@@ -166,13 +114,24 @@ func bootstrapKubernetesCluster(t *testing.T, workingDir string) {
 	eksClusterOutput := terraform.OutputAll(t, terraformOptions)["eks_cluster_output"].(map[string]interface{})
 
 	// Load cluster_arn for creating k8s options
-	clusterArn := test_structure.LoadString(t, workingDir, "cluster_arn")
+	clusterArn := eksClusterOutput["eks_cluster_arn"].(string)
+
+	// Save clusterArn for later for cleaning up k8s resources
+	test_structure.SaveString(t, workingDir, "cluster_arn", clusterArn)
 
 	// Get path to kubeconfig file
-	configPath, _ := k8s.GetKubeConfigPathE(t)
+	configPath, err := k8s.GetKubeConfigPathE(t)
+	require.NoError(t, err)
 
 	// Initialize k8s options
 	kubectlOptions := k8s.NewKubectlOptions(clusterArn, configPath, "")
+
+	// Check whether the EKS k8s cluster can be connected to via kubectl
+	err = k8s.RunKubectlE(t, kubectlOptions, "auth", "can-i", "'*'", "'*'")
+	if err != nil {
+		logger.Log(t, err.Error())
+		return
+	}
 
 	// Apply config_map file to K8S, this will allow the control plane discover worker nodes
 	k8s.KubectlApplyFromString(t, kubectlOptions, eksClusterOutput["config_map_aws_auth"].(string))
@@ -205,7 +164,8 @@ func cleanupKubernetesCluster(t *testing.T, workingDir string)  {
 	clusterArn := test_structure.LoadString(t, workingDir, "cluster_arn")
 
 	// Get path to kubeconfig file
-	configPath, _ := k8s.GetKubeConfigPathE(t)
+	configPath, err := k8s.GetKubeConfigPathE(t)
+	require.NoError(t, err)
 
 	// Initialize k8s options
 	kubectlOptions := k8s.NewKubectlOptions(clusterArn, configPath, "")
@@ -218,3 +178,6 @@ func cleanupKubernetesCluster(t *testing.T, workingDir string)  {
 	autoScalerFileContent := test_structure.LoadString(t, workingDir, "auto_scaler")
 	k8s.KubectlDeleteFromString(t, kubectlOptions, autoScalerFileContent)
 }
+
+
+func createElasticsearchCluster(t *testing.T) {}
