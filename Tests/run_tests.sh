@@ -5,4 +5,5 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-python test_elasticsearch.py -c $1
+export ES_CLUSTER_NAME="$1"
+ go test -timeout 60m -run TestEKSCluster -count=1
