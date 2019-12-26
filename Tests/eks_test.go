@@ -1,18 +1,17 @@
 package test
 
 import (
-	"os"
-	"os/exec"
-	"io/ioutil"
-	"strings"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/gruntwork-io/terratest/modules/k8s"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
+	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"strings"
+	"testing"
+	"time"
 )
 
 
@@ -28,6 +27,10 @@ func TestEKSCluster(t *testing.T) {
 	// Set the aws region in which the EKS cluster is deployed
 	awsRegion := "us-east-1"
 
+	// Cluster template files
+	elasticTemplateUrl := "https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/es-cluster.yml"
+	kibanaTemplateUrl  := "https://raw.githubusercontent.com/SymphonyOSF/ElasticsearchKubernetes/master/ESClusterDeployment/templates/kibana.yml"
+
 	// At the end of the test, undeploy the terraform infrastructure
 	defer test_structure.RunTestStage(t, "cleanup_terraform", func() {
 		undeployUsingTerraform(t, workingDir)
@@ -39,7 +42,9 @@ func TestEKSCluster(t *testing.T) {
 	})
 
 	// Destroy the Elasticsearch cluster
-	defer test_structure.RunTestStage(t, "destroy_es_cluster", func() {})
+	defer test_structure.RunTestStage(t, "destroy_es_cluster", func() {
+		destroyElasticsearchCluster(t, workingDir)
+	})
 
 	// Deploy the EKS Cluster on AWS using Terraform
 	test_structure.RunTestStage(t, "deploy_terraform", func() {
@@ -57,7 +62,7 @@ func TestEKSCluster(t *testing.T) {
 
 	// Create an Elasticsearch Cluster
 	test_structure.RunTestStage(t, "create_elastic_cluster", func() {
-		createElasticsearchCluster(t)
+		createElasticsearchCluster(t, workingDir, clusterName, elasticTemplateUrl, kibanaTemplateUrl)
 	})
 }
 
@@ -156,6 +161,17 @@ func bootstrapKubernetesCluster(t *testing.T, workingDir string) {
 
 	// Set the image to match the running K8S version
 	k8s.RunKubectl(t, kubectlOptions, "--namespace", "kube-system", "set", "image", "deployment.apps/cluster-autoscaler", "cluster-autoscaler=k8s.gcr.io/cluster-autoscaler:v1.14.6")
+
+	// Configure the elastic operator. Replace instance_type and service_instance_type
+	allInOneFile, err := ioutil.ReadFile("../Kubernetes/all-in-one.yaml")
+	require.NoError(t, err)
+
+	allInOneFileContent := strings.ReplaceAll(string(allInOneFile), "SERVICE_INSTANCE_TYPE", eksClusterOutput["service_instance_type"].(string))
+
+	k8s.KubectlApplyFromString(t, kubectlOptions, allInOneFileContent)
+
+	// Save allInOne config file for cleaning up later
+	test_structure.SaveString(t, workingDir, "all_in_one", allInOneFileContent)
 }
 
 
@@ -177,7 +193,59 @@ func cleanupKubernetesCluster(t *testing.T, workingDir string)  {
 	// Delete AutoScaler
 	autoScalerFileContent := test_structure.LoadString(t, workingDir, "auto_scaler")
 	k8s.KubectlDeleteFromString(t, kubectlOptions, autoScalerFileContent)
+
+	// Delete AllInOne (contains ES and Kibana related resources)
+	allInOneFileContent := test_structure.LoadString(t, workingDir, "all_in_one")
+	k8s.KubectlDeleteFromString(t, kubectlOptions, allInOneFileContent)
 }
 
 
-func createElasticsearchCluster(t *testing.T) {}
+func createElasticsearchCluster(t *testing.T, workingDir string,
+								clusterName string, elasticTemplateUrl string,
+								kibanaTemplateUrl string) {
+	cmd := exec.Command("ytt", "--data-value", "cluster_name=" + clusterName,
+					    "-f", elasticTemplateUrl, "-f", kibanaTemplateUrl, "-f",
+					    "../ESClusterDeployment/cluster_template.yml")
+	esClusterConfig, err := cmd.Output()
+	if err != nil {
+		logger.Log(t, err.Error())
+	}
+
+	// Save ES Cluster config for later (for destroying the ES and Kibana resources)
+	test_structure.SaveString(t, workingDir, "es_cluster_config", string(esClusterConfig))
+
+	// Load cluster_arn for creating k8s options
+	clusterArn := test_structure.LoadString(t, workingDir, "cluster_arn")
+
+	// Get path to kubeconfig file
+	configPath, err := k8s.GetKubeConfigPathE(t)
+	require.NoError(t, err)
+
+	// Initialize k8s options
+	kubectlOptions := k8s.NewKubectlOptions(clusterArn, configPath, "default")
+
+	// Create the elasticsearch and kibana k8s resources
+	k8s.KubectlApplyFromString(t, kubectlOptions, string(esClusterConfig))
+
+	// Wait for ES and kibana services to be up
+	time.Sleep(10 * time.Second)
+
+}
+
+
+func destroyElasticsearchCluster(t *testing.T, workingDir string) {
+	// Load cluster_arn for creating k8s options
+	clusterArn := test_structure.LoadString(t, workingDir, "cluster_arn")
+
+	// Get path to kubeconfig file
+	configPath, err := k8s.GetKubeConfigPathE(t)
+	require.NoError(t, err)
+
+	// Initialize k8s options
+	kubectlOptions := k8s.NewKubectlOptions(clusterArn, configPath, "default")
+
+	// Load ES Cluster Config
+	esClusterConfig := test_structure.LoadString(t, workingDir, "es_cluster_config")
+
+	k8s.KubectlDeleteFromString(t, kubectlOptions, string(esClusterConfig))
+}
