@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
-	"time"
 )
 
 
@@ -63,6 +62,11 @@ func TestEKSCluster(t *testing.T) {
 	// Create an Elasticsearch Cluster
 	test_structure.RunTestStage(t, "create_elastic_cluster", func() {
 		createElasticsearchCluster(t, workingDir, clusterName, elasticTemplateUrl, kibanaTemplateUrl)
+	})
+
+	// Test Elasticsearch Endpoints
+	test_structure.RunTestStage(t, "test_es_endpoints", func() {
+		testElasticsearchEndpoints(t, workingDir, clusterName)
 	})
 }
 
@@ -226,10 +230,6 @@ func createElasticsearchCluster(t *testing.T, workingDir string,
 
 	// Create the elasticsearch and kibana k8s resources
 	k8s.KubectlApplyFromString(t, kubectlOptions, string(esClusterConfig))
-
-	// Wait for ES and kibana services to be up
-	time.Sleep(10 * time.Second)
-
 }
 
 
@@ -248,4 +248,12 @@ func destroyElasticsearchCluster(t *testing.T, workingDir string) {
 	esClusterConfig := test_structure.LoadString(t, workingDir, "es_cluster_config")
 
 	k8s.KubectlDeleteFromString(t, kubectlOptions, string(esClusterConfig))
+}
+
+func testElasticsearchEndpoints(t *testing.T, workingDir string, clusterName string)  {
+	// Use the python script for testing ES endpoints for now as this project is being changed
+	// to use ES managed services instead
+	cmd := exec.Command("python", "test_elasticsearch.py", "--cluster-name", clusterName + "123")
+	output, err := cmd.CombinedOutput()
+	require.NoError(t, err)
 }

@@ -16,7 +16,7 @@ def init(cluster_name):
     logging.info("The cluster name is: " + cluster_name)
 
     # Record Elasticsearch and Kibana Endpoint
-    ELB_ENDPOINT    = 'ttps://' + os.popen('kubectl get svc/' + cluster_name + '-es-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':9200'
+    ELB_ENDPOINT    = 'https://' + os.popen('kubectl get svc/' + cluster_name + '-es-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':9200'
     KIBANA_ENDPOINT = 'https://' + os.popen('kubectl get svc/kibana-' + cluster_name + '-kb-http -o json | jq \'.status.loadBalancer.ingress[0].hostname\'').read().rstrip().strip('"') + ':5601'
 
     # Record Elasticsearch HTTP Credential
