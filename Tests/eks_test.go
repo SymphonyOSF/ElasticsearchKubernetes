@@ -256,6 +256,6 @@ func testElasticsearchEndpoints(t *testing.T, workingDir string, clusterName str
 	// Use the python script for testing ES endpoints for now as this project is being changed
 	// to use ES managed services instead
 	cmd := exec.Command("python", "test_elasticsearch.py", "--cluster-name", clusterName + "123")
-	output, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	require.NoError(t, err)
 }
