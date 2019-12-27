@@ -255,7 +255,7 @@ func destroyElasticsearchCluster(t *testing.T, workingDir string) {
 func testElasticsearchEndpoints(t *testing.T, workingDir string, clusterName string)  {
 	// Use the python script for testing ES endpoints for now as this project is being changed
 	// to use ES managed services instead
-	cmd := exec.Command("python", "test_elasticsearch.py", "--cluster-name", clusterName + "123")
+	cmd := exec.Command("python", "test_elasticsearch.py", "--cluster-name", clusterName)
 	_, err := cmd.CombinedOutput()
 	require.NoError(t, err)
 }
