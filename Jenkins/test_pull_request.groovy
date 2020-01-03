@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
 node('') {
-    echo "This is a random echo."
+    stage('Random Echo Statement') {
+        echo "This is a random echo."
+    }
 }
