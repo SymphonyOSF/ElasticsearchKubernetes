@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
 
-def folderName = ${FOLDER_NAME}
-
 node {
-    echo "Folder Name: ${folderName}"
+    echo "Folder Name: ${FOLDER_NAME}"
 }
