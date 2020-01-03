@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
 
-node {
+node('') {
     echo "This is a random echo."
 }
