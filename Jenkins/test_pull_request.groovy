@@ -2,4 +2,6 @@
 
 def folderName = ${FOLDER_NAME}
 
-echo "Folder Name: ${folderName}"
+node {
+    echo "Folder Name: ${folderName}"
+}
