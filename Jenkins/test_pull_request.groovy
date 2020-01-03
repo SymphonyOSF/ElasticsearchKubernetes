@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
 
-def folderName = params.FOLDER_NAME
+def folderName = ${FOLDER_NAME}
 
 echo "Folder Name: ${folderName}"
