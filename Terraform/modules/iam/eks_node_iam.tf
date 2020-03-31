@@ -2,20 +2,16 @@
 resource "aws_iam_role" "worker" {
   name = "${var.eks_cluster_name}_node_iam"
 
-  assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-POLICY
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKSWorkerNodePolicy" {
@@ -35,26 +31,22 @@ resource "aws_iam_role_policy_attachment" "worker_node_AmazonEC2ContainerRegistr
 
 resource "aws_iam_policy" "worker_auto_scale_policy" {
   name        = "${var.eks_cluster_name}_worker_auto_scale_policy"
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeAutoScalingInstances",
-                "autoscaling:DescribeLaunchConfigurations",
-                "autoscaling:DescribeTags",
-                "autoscaling:SetDesiredCapacity",
-                "autoscaling:TerminateInstanceInAutoScalingGroup",
-                "ec2:DescribeLaunchTemplateVersions"
-            ],
-            "Resource": "*",
-            "Effect": "Allow"
-        }
-    ]
-}
-EOF
+  policy = jsonencode({
+    Statement = [{
+      Action = [
+        "autoscaling:DescribeAutoScalingGroups",
+        "autoscaling:DescribeAutoScalingInstances",
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeTags",
+        "autoscaling:SetDesiredCapacity",
+        "autoscaling:TerminateInstanceInAutoScalingGroup",
+        "ec2:DescribeLaunchTemplateVersions"
+      ]
+      Resource = "*"
+      Effect = "Allow"
+    }]
+    Version = "2012-10-17"
+  })
 }
 
 resource "aws_iam_policy" "worker_dns_change_policy" {

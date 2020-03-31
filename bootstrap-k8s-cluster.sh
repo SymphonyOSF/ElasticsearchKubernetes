@@ -54,5 +54,5 @@ kubectl apply -f ${SCRIPT_DIR}/Kubernetes/Dashboard/dashboard-user.yaml
 #-------- /End Kubernetes Dashboard ----------
 
 #Configure the elastic operator. Replace instance_type and service_instance_type
-sed "s/SERVICE_INSTANCE_TYPE/${SERVICE_INSTANCE_TYPE}/g" ${SCRIPT_DIR}/Kubernetes/all-in-one.yaml \
+sed "s/SERVICE_INSTANCE_TYPE/${SERVICE_INSTANCE_TYPE}/g" ${SCRIPT_DIR}/Kubernetes/all-in-one2.yaml \
     | kubectl apply -f -

@@ -3,20 +3,16 @@ resource "aws_iam_role" "master" {
 
   name = "${var.cluster_name}_master_role"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "eks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "eks.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
 
   tags = {
     Name            = "elasticEksCluster"
